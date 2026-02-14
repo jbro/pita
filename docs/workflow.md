@@ -204,7 +204,9 @@ Required gates:
 2) Manual smoke checklist
    - Launch app (dev run)
    - Confirm window opens
-   - Confirm timeline/composer/palette placeholder regions are visible
+   - Confirm prompt send action is callable
+   - Confirm timeline updates from runtime events
+   - Confirm abort is visible/callable during run
 
 Also include:
 - npm run typecheck
