@@ -192,7 +192,9 @@ Run the phase-end quality gates now:
 1) Playwright Electron smoke test
 2) Manual smoke checklist
 
-Please report exact command output and checklist results, then stop for review.
+Please report exact command output and checklist results.
+If all gates pass, run /refine-docs and update any docs that should reflect the completed work.
+Then stop for review.
 ```
 
 ### 5) Wait for gate results, then review and integrate
