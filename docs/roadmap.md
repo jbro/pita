@@ -20,7 +20,7 @@ Completed:
 - Deterministic manual abort smoke path via staged `manual-abort` stub runtime mode.
 - Local SDK embedding for primary agent with stub fallback.
 - Steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) with pending count display.
-- Confirm-only prompt overlay backend contract across runtime adapter, orchestrator, IPC, and preload.
+- Confirm-only prompt overlay flow across runtime adapter, orchestrator, IPC, preload, and composer replacement UI.
 
 Remaining:
 - Command palette behavior beyond placeholder.
