@@ -14,7 +14,7 @@
 Shows:
 - user messages
 - assistant messages
-- tool executions as collapsible blocks
+- tool executions as collapsible blocks (collapse/expand not yet implemented — flat list with role labels)
 
 Behavior:
 - live streaming updates
@@ -24,7 +24,7 @@ Behavior:
 ### Prompt Composer (Bottom)
 
 Modes:
-- single-line input
+- single-line input (not yet distinct from multiline — textarea is always used)
 - multiline input
 - confirm overlay replacement mode (when a confirm prompt overlay request is active)
 
