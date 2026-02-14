@@ -56,6 +56,8 @@ Confirm:
 Notes:
 
 - `bun run dev` is long-running by design.
+- Runtime selection is SDK-first by default. Startup logs include a runtime selection line so operators can confirm `selected=sdk` or `selected=stub`.
+- Use `PITA_RUNTIME_KIND=stub` to force stub runtime startup when needed for deterministic checks.
 - The dev script sets `PITA_STUB_RUNTIME_MODE=manual-abort`, which keeps each stub run active long enough to click `Abort` reliably.
 - If scripting this check, use a timeout and terminate cleanly after confirmation.
 
