@@ -55,6 +55,13 @@ export class LocalSdkRuntimeAdapter implements RuntimeAdapter {
       }
     });
 
+    // Event ordering contract:
+    // The SDK may emit response.start/end synchronously during sendPrompt(),
+    // or asynchronously via the onEvent subscription. The fallback guards below
+    // ensure exactly one start and one end callback fires regardless of timing.
+    // The onEvent subscription is registered before sendPrompt() is called, so
+    // synchronous emissions are captured by the listener and the flags prevent
+    // the fallback from double-firing.
     try {
       if (!emittedStart) {
         callbacks.onStart(fallbackMessageId);
