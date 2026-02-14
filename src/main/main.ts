@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, type BrowserWindowConstructorOptions } fro
 import path from "node:path";
 import { registerSessionIpc } from "./ipc/sessionIpc";
 import { OrchestratorService } from "./orchestrator/OrchestratorService";
-import { createStubRuntimeAdapter } from "./runtime/stubRuntimeAdapter";
+import { createRuntimeAdapter } from "./runtime/runtimeAdapterFactory";
 
 export function getMainWindowOptions(): BrowserWindowConstructorOptions {
   return {
@@ -32,9 +32,17 @@ function createMainWindow(): BrowserWindow {
 }
 
 if (!process.env.VITEST) {
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
     let mainWindow: BrowserWindow | null = null;
-    const orchestrator = new OrchestratorService(createStubRuntimeAdapter());
+    const runtimeSelection = await createRuntimeAdapter();
+
+    if (runtimeSelection.fallbackReason) {
+      console.warn(
+        `[pita] Falling back to stub runtime after SDK bootstrap failure: ${runtimeSelection.fallbackReason}`
+      );
+    }
+
+    const orchestrator = new OrchestratorService(runtimeSelection.runtime);
 
     registerSessionIpc({
       ipcMain,
