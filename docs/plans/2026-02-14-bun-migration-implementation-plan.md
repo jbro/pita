@@ -105,7 +105,7 @@ In `scripts/run-electron-e2e.mjs`, replace npm/npx child process calls with Bun 
 Run:
 ```bash
 bun run build
-bun run test:e2e -- --list
+bun run test:e2e
 ```
 
 Expected: commands invoke expected toolchain paths without npm/npx.
