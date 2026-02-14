@@ -10,21 +10,21 @@ This project uses a two-speed test flow:
 Run these commands from the repository root:
 
 ```bash
-npm run typecheck
-npm run test
+bun run typecheck
+bun run test
 ```
 
 What they cover:
 
-- `npm run typecheck`: TypeScript checks for renderer and Electron/main code.
-- `npm run test`: Vitest + RTL DOM tests for shell and component placeholders.
+- `bun run typecheck`: TypeScript checks for renderer and Electron/main code.
+- `bun run test`: Vitest + RTL DOM tests for shell and component placeholders.
 
 ## Phase-end gate
 
 Run the Electron smoke test:
 
 ```bash
-npm run test:e2e
+bun run test:e2e
 ```
 
 What it does:
@@ -42,7 +42,7 @@ What it does:
 After automated checks pass, run:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Confirm:
@@ -55,14 +55,14 @@ Confirm:
 
 Notes:
 
-- `npm run dev` is long-running by design.
+- `bun run dev` is long-running by design.
 - If scripting this check, use a timeout and terminate cleanly after confirmation.
 
 ## Recommended run order
 
 For phase-end verification, use this order:
 
-1. `npm run typecheck`
-2. `npm run test`
-3. `npm run test:e2e`
-4. Manual smoke checklist (`npm run dev`)
+1. `bun run typecheck`
+2. `bun run test`
+3. `bun run test:e2e`
+4. Manual smoke checklist (`bun run dev`)

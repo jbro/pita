@@ -18,9 +18,11 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 ## Getting Started
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
+
+Bun is the authoritative package manager and task runner for this repository.
 
 For verification commands, see [docs/testing.md](docs/testing.md).
 
