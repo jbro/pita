@@ -52,6 +52,10 @@ Confirm:
 - Sending a prompt from the composer is possible.
 - Timeline updates while the runtime responds.
 - Abort control is visible while running.
+- Button label changes from "Send" to "Steer" while running.
+- Pressing Enter while running triggers steer (not a new prompt).
+- Pressing Alt+Enter while running queues a follow-up.
+- Pending count badge appears after steer or follow-up and resets when idle.
 
 Notes:
 

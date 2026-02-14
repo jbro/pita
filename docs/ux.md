@@ -28,10 +28,14 @@ Modes:
 - multiline input
 
 Actions:
-- send prompt (idle)
-- steer (streaming)
-- queue follow-up (streaming)
-- abort current run
+- send prompt (idle): Enter or click Send
+- steer (streaming): Enter or click Steer — interrupts after the current tool call
+- queue follow-up (streaming): Alt+Enter — delivered after the agent finishes
+- abort current run: click Abort
+
+The button label changes from "Send" to "Steer" while the agent is streaming.
+
+A pending count badge appears when steered or follow-up messages are queued (e.g. "3 queued"). It resets when the run completes.
 
 ## Command Palette and Shortcuts
 

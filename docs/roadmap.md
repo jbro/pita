@@ -18,10 +18,10 @@ Completed:
 - Initial orchestrator and IPC contracts for single-session flow.
 - Fast local tests + Electron smoke test workflow.
 - Deterministic manual abort smoke path via staged `manual-abort` stub runtime mode.
+- Local SDK embedding for primary agent with stub fallback.
+- Steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) with pending count display.
 
 Remaining:
-- Local SDK embedding for primary agent (replace stub runtime path).
-- Streaming controls parity for steer and queue follow-up.
 - Command palette behavior beyond placeholder.
 - Foreground-slot/background-queue orchestration parity work.
 - Multi-session behavior beyond architecture-level design.
