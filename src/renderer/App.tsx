@@ -5,7 +5,15 @@ import { TimelinePanel } from "./components/TimelinePanel";
 import { useSessionTimeline } from "./hooks/useSessionTimeline";
 
 export function App(): JSX.Element {
-  const { items } = useSessionTimeline();
+  const { items, runState } = useSessionTimeline();
+
+  const handleSend = async (text: string): Promise<void> => {
+    await window.pita.session.sendPrompt(text);
+  };
+
+  const handleAbort = async (): Promise<void> => {
+    await window.pita.session.abort();
+  };
 
   return (
     <ErrorBoundary>
@@ -17,7 +25,7 @@ export function App(): JSX.Element {
           <CommandPalettePlaceholder />
         </main>
 
-        <PromptComposerPanel />
+        <PromptComposerPanel runState={runState} onSend={handleSend} onAbort={handleAbort} />
       </div>
     </ErrorBoundary>
   );
