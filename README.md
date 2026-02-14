@@ -21,6 +21,15 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 - **One active agent runtime per worktree**
 - **Git and worktrees are required**
 
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+For verification commands, see [docs/testing.md](docs/testing.md).
+
 ## Documentation
 
 - [docs/overview.md](docs/overview.md) — product scope and architecture snapshot
