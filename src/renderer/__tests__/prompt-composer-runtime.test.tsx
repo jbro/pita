@@ -13,7 +13,10 @@ function setupPitaMock() {
   const steer = vi.fn(async () => undefined);
   const followUp = vi.fn(async () => undefined);
   const clearQueue = vi.fn(async () => ({ steering: [], followUp: [] }));
+  const submitPromptOverlay = vi.fn(async () => undefined);
+  const cancelPromptOverlay = vi.fn(async () => undefined);
   let timelineListener: ((event: SessionTimelineEvent) => void) | undefined;
+  let overlayListener: ((event: PromptOverlayEvent) => void) | undefined;
 
   (window as typeof window & {
     pita: {
@@ -42,9 +45,12 @@ function setupPitaMock() {
         timelineListener = listener;
         return () => undefined;
       }),
-      onPromptOverlayEvent: vi.fn(() => () => undefined),
-      submitPromptOverlay: vi.fn(async () => undefined),
-      cancelPromptOverlay: vi.fn(async () => undefined)
+      onPromptOverlayEvent: vi.fn((listener: (event: PromptOverlayEvent) => void) => {
+        overlayListener = listener;
+        return () => undefined;
+      }),
+      submitPromptOverlay,
+      cancelPromptOverlay
     }
   };
 
@@ -54,9 +60,16 @@ function setupPitaMock() {
     steer,
     followUp,
     clearQueue,
+    submitPromptOverlay,
+    cancelPromptOverlay,
     emit(event: SessionTimelineEvent) {
       act(() => {
         timelineListener?.(event);
+      });
+    },
+    emitOverlay(event: PromptOverlayEvent) {
+      act(() => {
+        overlayListener?.(event);
       });
     }
   };
@@ -209,5 +222,48 @@ describe("Prompt composer runtime wiring", () => {
 
     expect(mock.steer).toHaveBeenCalledWith("do it");
     expect(mock.sendPrompt).not.toHaveBeenCalled();
+  });
+
+  it("confirm overlay confirm action calls submitPromptOverlay", () => {
+    render(<App />);
+
+    mock.emitOverlay({
+      type: "prompt_overlay_request",
+      requestId: "req-confirm",
+      kind: "confirm",
+      title: "Confirm action",
+      message: "Do the thing?",
+      confirmLabel: "Confirm",
+      cancelLabel: "Cancel"
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(mock.submitPromptOverlay).toHaveBeenCalledWith({
+      requestId: "req-confirm",
+      decision: "confirm"
+    });
+    expect(mock.sendPrompt).not.toHaveBeenCalled();
+    expect(mock.steer).not.toHaveBeenCalled();
+  });
+
+  it("confirm overlay cancel action calls cancelPromptOverlay", () => {
+    render(<App />);
+
+    mock.emitOverlay({
+      type: "prompt_overlay_request",
+      requestId: "req-cancel",
+      kind: "confirm",
+      title: "Confirm action",
+      message: "Do the thing?",
+      confirmLabel: "Confirm",
+      cancelLabel: "Cancel"
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(mock.cancelPromptOverlay).toHaveBeenCalledWith({ requestId: "req-cancel" });
+    expect(mock.sendPrompt).not.toHaveBeenCalled();
+    expect(mock.steer).not.toHaveBeenCalled();
   });
 });
