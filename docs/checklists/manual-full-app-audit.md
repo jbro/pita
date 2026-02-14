@@ -11,7 +11,7 @@ How to fill each item:
 ## Tier 1 — Critical operator path (must work)
 
 ### A1. Start dev app
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Open a terminal at repository root.
@@ -26,7 +26,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### A2. Electron window opens
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. With `bun run dev` still running, check for app window.
@@ -38,7 +38,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### A3. Timeline panel visible
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. In the app window, locate the top section.
@@ -50,7 +50,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### A4. Prompt composer visible
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. In the app window, locate the bottom section.
@@ -62,7 +62,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### A5. Command palette placeholder visible
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Scan the shell UI for the command palette placeholder area.
@@ -76,7 +76,7 @@ Observed (if FAIL/UNCLEAR):
 ---
 
 ### B1. Send prompt via button
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Enter text in prompt input (example: `Test prompt run`).
@@ -89,7 +89,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### B2. Timeline receives runtime updates
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. After sending prompt, watch timeline items update.
@@ -101,7 +101,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### B3. Send button label changes to Steer during run
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Start a run.
@@ -114,7 +114,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### B4. Abort enabled while running
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Start a run.
@@ -127,7 +127,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### B5. Abort returns UI to idle
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. While run is active, click `Abort`.
@@ -141,7 +141,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### B6. Primary button label returns to Send after idle
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Complete or abort a run.
@@ -156,7 +156,7 @@ Observed (if FAIL/UNCLEAR):
 ---
 
 ### C1. Enter while idle sends prompt
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Ensure app is idle.
@@ -170,7 +170,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### C2. Enter while running performs steer
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[ ] PASS  [ ] FAIL  [x] UNCLEAR
 
 Steps:
 1. Start a run.
@@ -181,10 +181,11 @@ Expected:
 - Steer action is triggered (not a fresh normal send).
 
 Observed (if FAIL/UNCLEAR):
-- 
+- When "steering" I see a message that says 1 queued, but I can't tell if
+    that is steering or even if the queued prompt gets send
 
 ### C3. Alt+Enter while running queues follow-up
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[ ] PASS  [ ] FAIL  [x] UNCLEAR
 
 Steps:
 1. Start a run.
@@ -195,10 +196,10 @@ Expected:
 - Follow-up is queued.
 
 Observed (if FAIL/UNCLEAR):
-- 
+- I see the same as with steer, so I can't tell them apart
 
 ### C4. Alt+Enter while idle behaves like send
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Ensure app is idle.
@@ -214,7 +215,7 @@ Observed (if FAIL/UNCLEAR):
 ---
 
 ### D1. Pending queue badge appears after steer/follow-up
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Start a run.
@@ -228,7 +229,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### D2. Pending badge count increments with multiple queued actions
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. During one active run, queue multiple steer/follow-up actions.
@@ -241,7 +242,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### D3. Pending badge resets on idle
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Create pending queue while running.
@@ -258,7 +259,7 @@ Observed (if FAIL/UNCLEAR):
 ## Tier 2 — Runtime and compatibility behavior
 
 ### E1. Default startup is SDK-first
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[ ] PASS  [x] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Stop running app.
@@ -269,10 +270,10 @@ Expected:
 - Startup indicates SDK-first selection attempt (or explicit fallback reason).
 
 Observed (if FAIL/UNCLEAR):
-- 
+- [pita] Runtime selection: selected=stub requested=sdk-default stubMode=manual-abort fallback=yes reason=Local SDK session object does not expose a prompt method.
 
 ### E2. Forced stub startup works
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Stop running app.
@@ -285,7 +286,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### E3. Stub mode still supports send/stream/abort
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Keep app running in forced stub mode.
@@ -300,7 +301,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### E4. Manual-abort mode gives enough time to click Abort
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Use dev run (`bun run dev`) which sets `PITA_STUB_RUNTIME_MODE=manual-abort`.
@@ -316,7 +317,7 @@ Observed (if FAIL/UNCLEAR):
 ---
 
 ### F1. Abort while idle is safe no-op
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[ ] PASS  [ ] FAIL  [x] UNCLEAR
 
 Steps:
 1. Ensure app is idle.
@@ -327,10 +328,10 @@ Expected:
 - No broken UI state.
 
 Observed (if FAIL/UNCLEAR):
-- 
+- Abort is not clickable when UI is idle
 
 ### F2. Multiple sequential runs remain stable
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Run prompt lifecycle 3 times in sequence: send -> complete/abort -> send again.
@@ -342,7 +343,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### F3. Input remains usable across state changes
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Type text while idle.
@@ -358,7 +359,7 @@ Observed (if FAIL/UNCLEAR):
 ---
 
 ### G1. Overlay backend additions do not destabilize app
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[ ] PASS  [ ] FAIL  [x] UNCLEAR
 
 Steps:
 1. Run Tier 1 scenarios end to end.
@@ -371,7 +372,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### G2. No obvious preload/session API errors for overlay methods
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Open devtools console (if available).
@@ -385,7 +386,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### G3. Existing prompt lifecycle behavior unaffected
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Re-run B and C sections quickly.
@@ -401,7 +402,7 @@ Observed (if FAIL/UNCLEAR):
 ## Tier 3 — UX and docs consistency
 
 ### H1. Dark theme and layout consistency
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Inspect shell after startup and after one run.
@@ -414,7 +415,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### H2. Timeline readability during updates
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Send prompt and watch timeline during streaming.
@@ -426,7 +427,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### H3. Composer controls remain understandable
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Observe composer labels in idle and running states.
@@ -440,7 +441,7 @@ Observed (if FAIL/UNCLEAR):
 ---
 
 ### I1. README high-level claims match observed behavior
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Read `README.md` feature bullets.
@@ -453,7 +454,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### I2. docs/overview status matches current behavior
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Read `docs/overview.md` implementation status.
@@ -466,7 +467,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### I3. docs/testing manual checklist matches what is runnable
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Read `docs/testing.md` manual smoke section.
@@ -483,7 +484,7 @@ Observed (if FAIL/UNCLEAR):
 ## Optional command checks
 
 ### J1. Typecheck
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Run `bun run typecheck`.
@@ -495,7 +496,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### J2. Unit/integration tests
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Run `bun run test`.
@@ -507,7 +508,7 @@ Observed (if FAIL/UNCLEAR):
 - 
 
 ### J3. E2E smoke
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Run `bun run test:e2e`.
