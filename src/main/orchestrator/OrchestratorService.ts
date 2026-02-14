@@ -10,6 +10,9 @@ export interface RuntimeCallbacks {
 export interface RuntimeAdapter {
   run(text: string, callbacks: RuntimeCallbacks): Promise<void>;
   abort(): void;
+  steer?(text: string): void;
+  followUp?(text: string): void;
+  clearQueue?(): { steering: string[]; followUp: string[] };
 }
 
 type TimelineListener = (event: SessionTimelineEvent) => void;
