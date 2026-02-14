@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  type PromptOverlayEvent,
-  type PromptOverlayRequestEvent,
-  type PromptOverlaySubmitRequest
-} from "../shared/ipc";
+import { type PromptOverlayEvent, type PromptOverlayRequestEvent } from "../shared/ipc";
 import { CommandPalettePlaceholder } from "./components/CommandPalettePlaceholder";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PromptComposerPanel } from "./components/PromptComposerPanel";
@@ -52,8 +48,7 @@ export function App(): JSX.Element {
   };
 
   const handleConfirmOverlaySubmit = async (requestId: string): Promise<void> => {
-    const request: PromptOverlaySubmitRequest = { requestId, decision: "confirm" };
-    await window.pita.session.submitPromptOverlay(request);
+    await window.pita.session.submitPromptOverlay({ requestId, decision: "confirm" });
   };
 
   const handleConfirmOverlayCancel = async (requestId: string): Promise<void> => {
@@ -70,44 +65,18 @@ export function App(): JSX.Element {
           <CommandPalettePlaceholder />
         </main>
 
-        {activeConfirmOverlay ? (
-          <section
-            className="panel composer-panel"
-            data-testid="prompt-composer-panel"
-            aria-label="Prompt composer panel"
-          >
-            <h2>{activeConfirmOverlay.title}</h2>
-            <p>{activeConfirmOverlay.message}</p>
-            <div className="composer-actions">
-              <button
-                type="button"
-                onClick={() => {
-                  void handleConfirmOverlaySubmit(activeConfirmOverlay.requestId);
-                }}
-              >
-                {activeConfirmOverlay.confirmLabel}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  void handleConfirmOverlayCancel(activeConfirmOverlay.requestId);
-                }}
-              >
-                {activeConfirmOverlay.cancelLabel}
-              </button>
-            </div>
-          </section>
-        ) : (
-          <PromptComposerPanel
-            runState={runState}
-            steerCount={steerCount}
-            followUpCount={followUpCount}
-            onSend={handleSend}
-            onSteer={handleSteer}
-            onFollowUp={handleFollowUp}
-            onAbort={handleAbort}
-          />
-        )}
+        <PromptComposerPanel
+          runState={runState}
+          steerCount={steerCount}
+          followUpCount={followUpCount}
+          activeConfirmOverlay={activeConfirmOverlay}
+          onSend={handleSend}
+          onSteer={handleSteer}
+          onFollowUp={handleFollowUp}
+          onAbort={handleAbort}
+          onConfirmOverlaySubmit={handleConfirmOverlaySubmit}
+          onConfirmOverlayCancel={handleConfirmOverlayCancel}
+        />
       </div>
     </ErrorBoundary>
   );
