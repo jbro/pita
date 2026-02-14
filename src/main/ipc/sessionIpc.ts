@@ -1,8 +1,10 @@
 import {
   IPC_CHANNELS,
+  type PromptOverlayCancelRequest,
+  type PromptOverlaySubmitRequest,
+  type SessionFollowUpRequest,
   type SessionSendPromptRequest,
-  type SessionSteerRequest,
-  type SessionFollowUpRequest
+  type SessionSteerRequest
 } from "../../shared/ipc";
 import type { OrchestratorService } from "../orchestrator/OrchestratorService";
 
@@ -51,8 +53,23 @@ export function registerSessionIpc(options: RegisterSessionIpcOptions): void {
     return orchestrator.clearQueue();
   });
 
+  ipcMain.handle(IPC_CHANNELS.sessionPromptOverlaySubmit, (_event, payload) => {
+    const request = payload as PromptOverlaySubmitRequest;
+    orchestrator.submitPromptOverlay(request.requestId, request.decision);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.sessionPromptOverlayCancel, (_event, payload) => {
+    const request = payload as PromptOverlayCancelRequest;
+    orchestrator.cancelPromptOverlay(request.requestId);
+  });
+
   orchestrator.onTimelineEvent((event) => {
     const targetWindow = getTargetWindow();
     targetWindow?.webContents.send(IPC_CHANNELS.sessionTimelineEvent, event);
+  });
+
+  orchestrator.onPromptOverlayEvent((event) => {
+    const targetWindow = getTargetWindow();
+    targetWindow?.webContents.send(IPC_CHANNELS.sessionPromptOverlayEvent, event);
   });
 }
