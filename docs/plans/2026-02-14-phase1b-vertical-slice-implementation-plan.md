@@ -8,6 +8,13 @@
 
 **Tech Stack:** TypeScript, Electron, React, Vitest, React Testing Library, Playwright (Electron)
 
+## Next Session Pickup (Side Quest)
+
+After this plan is complete, the next session should pick up this side quest first:
+- migrate the project from **npm** to **bun**.
+
+Do not treat this note as an implementation plan. The migration must be planned in a dedicated planning session before code changes.
+
 ---
 
 ## Ground Rules
