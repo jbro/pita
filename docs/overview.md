@@ -25,7 +25,8 @@ Implemented now:
 - runnable Electron + React shell,
 - single-session send and abort controls,
 - streamed timeline updates via main-process IPC,
-- deterministic stub runtime behavior for local smoke tests.
+- deterministic stub runtime behavior for local smoke tests,
+- explicit `manual-abort` stub mode for reliable abort checks in dev smoke runs.
 
 Not implemented yet:
 - steer and queue follow-up behavior,

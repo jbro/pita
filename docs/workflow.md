@@ -206,7 +206,7 @@ Required gates:
    - Confirm window opens
    - Confirm prompt send action is callable
    - Confirm timeline updates from runtime events
-   - Confirm abort is visible; confirm callability when a long-running run is available
+   - Confirm abort is visible and callable during a running stub response (`bun run dev` sets `PITA_STUB_RUNTIME_MODE=manual-abort`)
 
 Also include:
 - bun run typecheck

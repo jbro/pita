@@ -45,6 +45,7 @@ Responsibilities:
 Phase 1B implementation note:
 - Session IPC handlers are registered during startup and forward orchestrator timeline events to the active window.
 - The current runtime path is intentionally stubbed for deterministic vertical-slice behavior.
+- Stub runtime mode is selected via `PITA_STUB_RUNTIME_MODE` (`default` or `manual-abort`) to keep manual abort smoke deterministic without slowing all test paths.
 
 ### 3. Orchestrator Service (Main Process Module)
 
