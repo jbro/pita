@@ -1,6 +1,6 @@
 # Project Overview
 
-## V1 Scope
+## V1 Scope (Target)
 
 - Electron app (Linux first), dark mode.
 - Timeline at the top, prompt composer at the bottom.
@@ -11,6 +11,19 @@
 - Local primary agent via Pi SDK embedding.
 - Multi-session support in architecture (UI can expose it later).
 - Background event queue and pause/resume semantics in orchestration layer.
+
+## Current Implementation Status
+
+Implemented now:
+- runnable Electron + React shell,
+- single-session send and abort controls,
+- streamed timeline updates via main-process IPC,
+- deterministic stub runtime behavior for local smoke tests.
+
+Not implemented yet:
+- steer and queue follow-up behavior,
+- multi-session UI controls,
+- local SDK runtime integration (beyond stubbed vertical-slice runtime).
 
 ## Architecture Snapshot
 

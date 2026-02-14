@@ -8,14 +8,22 @@
 
 ## Phase 1 — V1 (Local Operator MVP)
 
+Status: **in progress**
+
+Completed:
 - Electron shell + React renderer.
-- Timeline + prompt composer UI.
-- Dark mode and keyboard-first interactions.
-- Command palette (app commands only).
-- Local SDK embedding for primary agent.
-- Streaming controls: prompt, steer, queue follow-up, abort.
-- Orchestrator with foreground slot and background event queue.
-- Multi-session support in architecture layer.
+- Timeline + prompt composer UI baseline.
+- Dark mode and keyboard-first static shell.
+- Vertical slice wiring for prompt send, abort, and streamed timeline updates.
+- Initial orchestrator and IPC contracts for single-session flow.
+- Fast local tests + Electron smoke test workflow.
+
+Remaining:
+- Local SDK embedding for primary agent (replace stub runtime path).
+- Streaming controls parity for steer and queue follow-up.
+- Command palette behavior beyond placeholder.
+- Foreground-slot/background-queue orchestration parity work.
+- Multi-session behavior beyond architecture-level design.
 
 ## Phase 2 — Session and Workspace Expansion
 
