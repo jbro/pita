@@ -27,10 +27,11 @@ Implemented now:
 - streamed timeline updates via main-process IPC,
 - SDK-first local runtime selection at startup,
 - explicit stub override (`PITA_RUNTIME_KIND=stub`) with deterministic `manual-abort` mode for smoke checks,
-- automatic stub fallback when SDK bootstrap fails.
+- automatic stub fallback when SDK bootstrap fails,
+- steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) behavior matching TUI parity,
+- queue status display (pending message count) in prompt composer.
 
 Not implemented yet:
-- steer and queue follow-up behavior,
 - multi-session UI controls,
 - deeper local SDK parity work beyond initial session wiring (for example extension prompt flows and richer event-role coverage).
 
