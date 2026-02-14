@@ -33,6 +33,10 @@ Not implemented yet:
 - multi-session UI controls,
 - local SDK runtime integration (beyond stubbed vertical-slice runtime).
 
+## Documentation note
+
+`docs/plans/*` contains historical planning and verification records. Those files may still mention npm in historical context, even though Bun is now the active project workflow.
+
 ## Architecture Snapshot
 
 - **Renderer (React):** timeline, prompt, command palette, shortcuts.
