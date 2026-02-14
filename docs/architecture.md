@@ -42,6 +42,10 @@ Responsibilities:
 - IPC boundary to renderer.
 - Command dispatch to orchestration layer.
 
+Phase 1B implementation note:
+- Session IPC handlers are registered during startup and forward orchestrator timeline events to the active window.
+- The current runtime path is intentionally stubbed for deterministic vertical-slice behavior.
+
 ### 3. Orchestrator Service (Main Process Module)
 
 Responsibilities:
@@ -189,6 +193,16 @@ interface PromptOverlayRequestBase {
   createdAt: string; // ISO timestamp
 }
 ```
+
+## Preload Bridge Constraint (Current)
+
+The preload script runs in sandboxed mode and currently defines IPC channel names and timeline event shape locally.
+
+Reason:
+- importing shared preload dependencies from sandboxed preload caused module resolution failures in packaged Electron runs.
+
+Implication:
+- keep preload bridge types and channel names synchronized with `src/shared/ipc.ts` until a shared-safe preload import strategy is introduced.
 
 ## TUI Compatibility Contract (Primary)
 

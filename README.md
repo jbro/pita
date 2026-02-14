@@ -29,6 +29,7 @@ Implemented in this slice:
 - normalized timeline event forwarding (`session.timelineEvent`)
 - preload bridge methods for send/abort/event subscription
 - renderer hook-driven timeline updates and runtime-bound composer controls
+- deterministic stub runtime behavior for smoke-testable send/stream/abort flow
 
 Out of scope for this slice:
 - steer/follow-up orchestration

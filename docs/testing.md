@@ -33,6 +33,7 @@ What it does:
 2. Launches Electron with Playwright.
 3. Verifies vertical-slice behavior:
    - `timeline-panel` and `prompt-composer-panel` are visible
+   - preload session bridge is available (`window.pita.session.sendPrompt`)
    - prompt input exists and send is callable
    - timeline receives at least one runtime-driven update after send
 
