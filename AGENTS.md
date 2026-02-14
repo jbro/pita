@@ -33,6 +33,31 @@ When starting a new planning or implementation session:
 4. For UI questions, compare with `packages/tui` first, then `packages/web-ui` for optional patterns.
 5. Do not introduce a second session authority; Pi session files remain canonical.
 
+## Workflow Compliance (Mandatory)
+
+Before proposing execution mechanics (worktrees, session handoff, clipboard prompts, phase-end gates, merge/cleanup), read and follow `docs/workflow.md`.
+
+Required behavior:
+
+1. Treat `docs/workflow.md` as the operational source of truth for session handoff.
+2. Use the documented parallel-session handoff steps (including detached `wl-copy` usage) when applicable.
+3. After delegated/parallel implementation reports completion, run the documented phase-end gates process before integration.
+4. Only merge to `main` and clean up worktree/branch after gate results are reviewed and accepted.
+
+If instructions from memory conflict with `docs/workflow.md`, follow the document and call out the difference explicitly.
+
+## Session Reestablishment Protocol (Always Do First)
+
+At the start of every new or resumed session, before proposing implementation work:
+
+1. Re-read `README.md` and `docs/architecture.md`.
+2. Inspect recent project activity (e.g., changed files, recent commits, open plan docs) to infer what is in progress.
+3. Summarize the inferred current objective, what is done, and what is still open.
+4. Recommend the best next actions (ordered, concrete, and minimal).
+5. If context is still ambiguous, ask one focused clarification question before proceeding.
+
+This reestablishment step is mandatory and precedes planning, coding, or verification actions.
+
 ## Architecture Intent
 
 - `packages/coding-agent` is runtime authority for behavior.

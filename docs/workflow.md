@@ -94,6 +94,135 @@ git branch -d feature/agent-ui
 
 For agent-specific session handoff guidance, see `AGENTS.md`.
 
+## Parallel Session Handoff (Worktree + Clipboard Prompts)
+
+Use this workflow when implementation happens in a separate Pi session.
+
+### Quick command block (copy/paste template)
+
+```bash
+# 1) Create isolated worktree
+cd /home/jbr/projects/pita
+git worktree add .worktrees/<worktree-name> -b <branch-name>
+
+# 2) Prepare kickoff prompt
+cat <<'EOF' >/tmp/pita-session-prompt.txt
+I'm using the executing-plans skill to implement this plan.
+
+Plan file:
+docs/plans/<plan-file>.md
+
+Please:
+1) review the plan critically and raise any concerns first,
+2) execute the first batch (default first 3 tasks),
+3) report exact verification output,
+4) stop for feedback with: "Ready for feedback."
+EOF
+
+# 3) Copy prompt to clipboard (detached)
+nohup sh -c 'cat /tmp/pita-session-prompt.txt | wl-copy' >/tmp/wl-copy-nohup.log 2>&1 &
+
+# 4) Verify clipboard and start session
+wl-paste | sed -n '1,20p'
+cd .worktrees/<worktree-name>
+$HOME/node_modules/.bin/pi
+```
+
+### 1) Create isolated worktree from `main`
+
+```bash
+cd /home/jbr/projects/pita
+git worktree add .worktrees/<worktree-name> -b <branch-name>
+```
+
+Example:
+
+```bash
+git worktree add .worktrees/phase1-ui-shell -b phase1/ui-shell-static
+```
+
+### 2) Prepare implementation kickoff prompt and copy to clipboard
+
+Create prompt file:
+
+```bash
+cat <<'EOF' >/tmp/pita-session-prompt.txt
+I'm using the executing-plans skill to implement this plan.
+
+Plan file:
+docs/plans/<plan-file>.md
+
+Please:
+1) review the plan critically and raise any concerns first,
+2) execute the first batch (default first 3 tasks),
+3) report exact verification output,
+4) stop for feedback with: "Ready for feedback."
+EOF
+```
+
+Copy without blocking terminal (`wl-copy` stays alive to serve clipboard data):
+
+```bash
+nohup sh -c 'cat /tmp/pita-session-prompt.txt | wl-copy' >/tmp/wl-copy-nohup.log 2>&1 &
+```
+
+Verify clipboard:
+
+```bash
+wl-paste | sed -n '1,20p'
+```
+
+### 3) Start separate Pi session in the worktree
+
+```bash
+cd .worktrees/<worktree-name>
+$HOME/node_modules/.bin/pi
+```
+
+Paste the kickoff prompt as the first message.
+
+### 4) Wait for implementation batch completion
+
+When the implementation session reports completion, prepare a **phase-end gates prompt** and copy it with `wl-copy` the same way.
+
+Suggested phase-end gates prompt:
+
+```text
+Run the phase-end quality gates now:
+1) Playwright Electron smoke test
+2) Manual smoke checklist
+
+Please report exact command output and checklist results, then stop for review.
+```
+
+### 5) Wait for gate results, then review and integrate
+
+When told gates passed:
+
+1. Review worktree changes carefully.
+2. If quality is acceptable, merge branch into `main`.
+3. Clean up branch and worktree.
+
+Example cleanup flow:
+
+```bash
+cd /home/jbr/projects/pita
+git switch main
+git merge --ff-only <branch-name> # or regular merge if needed
+git worktree remove .worktrees/<worktree-name>
+git branch -d <branch-name>
+```
+
+### Troubleshooting clipboard handoff
+
+If clipboard copy appears to hang, check environment and run detached:
+
+```bash
+which wl-copy
+echo "$WAYLAND_DISPLAY"
+nohup sh -c 'cat /tmp/pita-session-prompt.txt | wl-copy' >/tmp/wl-copy-nohup.log 2>&1 &
+```
+
 ## Error and Recovery Guidelines
 
 - On lock conflict: show current owner and refuse start.
