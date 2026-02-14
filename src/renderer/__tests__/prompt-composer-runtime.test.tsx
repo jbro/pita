@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
   PromptOverlayEvent,
@@ -265,5 +265,32 @@ describe("Prompt composer runtime wiring", () => {
     expect(mock.cancelPromptOverlay).toHaveBeenCalledWith({ requestId: "req-cancel" });
     expect(mock.sendPrompt).not.toHaveBeenCalled();
     expect(mock.steer).not.toHaveBeenCalled();
+  });
+
+  it("shows inline error and keeps overlay active when submitPromptOverlay rejects", async () => {
+    mock.submitPromptOverlay.mockRejectedValueOnce(new Error("submit failed"));
+
+    render(<App />);
+
+    mock.emitOverlay({
+      type: "prompt_overlay_request",
+      requestId: "req-error",
+      kind: "confirm",
+      title: "Confirm action",
+      message: "Do the thing?",
+      confirmLabel: "Confirm",
+      cancelLabel: "Cancel"
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("confirm-overlay-error").textContent).toBe(
+        "Could not submit confirmation. Try again."
+      );
+    });
+
+    expect(screen.getByText("Confirm action")).toBeTruthy();
+    expect(screen.queryByPlaceholderText("Ask Pi to continue…")).toBeNull();
   });
 });
