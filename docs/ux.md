@@ -26,6 +26,7 @@ Behavior:
 Modes:
 - single-line input
 - multiline input
+- confirm overlay replacement mode (when a confirm prompt overlay request is active)
 
 Actions:
 - send prompt (idle): Enter or click Send
@@ -60,7 +61,7 @@ V1 provides fixed default keybindings. User-editable keymaps come later.
 
 ## Deferred UX (Post-V1)
 
-Note: backend support for confirm-only prompt overlay events exists. The renderer overlay UX listed below is still pending.
+Note: confirm-only prompt replacement overlay is now implemented in the composer area. The richer overlay UX listed below is still pending.
 
 - Mission-control session overview.
 - Resizable side panels (file tree, git, remote agents).

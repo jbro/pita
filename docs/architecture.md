@@ -161,7 +161,7 @@ This supports future self-steering and remote orchestration without forcing a co
 
 ## Extension UI Bridge (Phase 2)
 
-Current status: backend bridge is implemented for a confirm-only slice (runtime adapter -> orchestrator -> IPC -> preload). Renderer overlay UX is not implemented yet.
+Current status: confirm-only slice is implemented end-to-end (runtime adapter -> orchestrator -> IPC -> preload -> renderer composer replacement). Choice/freeform overlay UX remains unimplemented.
 
 To support structured agent questions in the desktop UI, add an extension UI bridge between Pi runtime events and renderer overlays.
 
@@ -191,7 +191,7 @@ Implemented subset today:
 |---|---|---|---|
 | `prompt_overlay_request` | Orchestrator -> Renderer | `requestId`, `kind` | Implemented now for `kind: confirm`; broader kinds remain planned |
 | `prompt_overlay_request.choice` | Orchestrator -> Renderer | `title`, `options[]`, `allowFreeform` | `options` include `id`, `label`, optional `shortcut` |
-| `prompt_overlay_request.confirm` | Orchestrator -> Renderer | `title`, `message`, `confirmLabel`, `cancelLabel` | Replaces prompt area until resolved |
+| `prompt_overlay_request.confirm` | Orchestrator -> Renderer | `title`, `message`, `confirmLabel`, `cancelLabel` | Implemented: replaces composer prompt area until resolved |
 | `prompt_overlay_submit_choice` | Renderer -> Orchestrator | `requestId`, `selectedOptionId` | Sent on mouse, arrow+enter, or numeric selection |
 | `prompt_overlay_submit_text` | Renderer -> Orchestrator | `requestId`, `text` | Freeform fallback path |
 | `prompt_overlay_cancel` | Renderer -> Orchestrator | `requestId` | User cancelled or dismissed request |
