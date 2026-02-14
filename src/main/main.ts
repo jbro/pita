@@ -49,19 +49,26 @@ function createStubRuntimeAdapter(): RuntimeAdapter {
 
 if (!process.env.VITEST) {
   app.whenReady().then(() => {
+    let mainWindow: BrowserWindow | null = null;
     const orchestrator = new OrchestratorService(createStubRuntimeAdapter());
 
     registerSessionIpc({
       ipcMain,
       orchestrator,
-      getTargetWindow: () => BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? null
+      getTargetWindow: () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          return mainWindow;
+        }
+
+        return BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? null;
+      }
     });
 
-    createMainWindow();
+    mainWindow = createMainWindow();
 
     app.on("activate", () => {
       if (BrowserWindow.getAllWindows().length === 0) {
-        createMainWindow();
+        mainWindow = createMainWindow();
       }
     });
   });

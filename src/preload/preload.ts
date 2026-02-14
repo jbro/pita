@@ -1,9 +1,21 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { IPC_CHANNELS, type SessionTimelineEvent } from "../shared/ipc";
-import { preloadApi } from "../shared/preload-api";
+
+const IPC_CHANNELS = {
+  sessionSendPrompt: "session.sendPrompt",
+  sessionAbort: "session.abort",
+  sessionTimelineEvent: "session.timelineEvent"
+} as const;
+
+type SessionTimelineEvent =
+  | { type: "state"; state: "idle" | "running" | "aborting" | "error" }
+  | { type: "response.start"; messageId: string }
+  | { type: "response.chunk"; messageId: string; chunk: string }
+  | { type: "response.end"; messageId: string }
+  | { type: "response.abort" }
+  | { type: "error"; message: string };
 
 contextBridge.exposeInMainWorld("pita", {
-  ...preloadApi.pita,
+  version: "stub",
   session: {
     sendPrompt(text: string): Promise<void> {
       return ipcRenderer.invoke(IPC_CHANNELS.sessionSendPrompt, { text });

@@ -1,6 +1,6 @@
 import { _electron as electron, expect, test } from "@playwright/test";
 
-test("phase1 ui shell smoke", async () => {
+test("phase1b send stream abort smoke", async () => {
   const electronApp = await electron.launch({
     args: ["dist/main/main.js"]
   });
@@ -10,7 +10,21 @@ test("phase1 ui shell smoke", async () => {
 
     await expect(window.getByTestId("timeline-panel")).toBeVisible();
     await expect(window.getByTestId("prompt-composer-panel")).toBeVisible();
-    await expect(window.getByTestId("command-palette-placeholder")).toBeVisible();
+
+    await expect.poll(async () => {
+      return window.evaluate(() => typeof window.pita?.session?.sendPrompt);
+    }).toBe("function");
+
+    const promptInput = window.getByPlaceholder("Ask Pi to continue…");
+    await expect(promptInput).toBeVisible();
+
+    await promptInput.fill("Run smoke runtime prompt");
+
+    const sendButton = window.getByRole("button", { name: "Send" });
+    await expect(sendButton).toBeEnabled();
+    await sendButton.click();
+
+    await expect(window.locator(".timeline-item")).toHaveCount(1);
   } finally {
     await electronApp.close();
   }
