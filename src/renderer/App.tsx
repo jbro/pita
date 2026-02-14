@@ -7,7 +7,7 @@ import { TimelinePanel } from "./components/TimelinePanel";
 import { useSessionTimeline } from "./hooks/useSessionTimeline";
 
 export function App(): JSX.Element {
-  const { items, runState, steerCount, followUpCount } = useSessionTimeline();
+  const { items, runState, steerCount, followUpCount, addUserMessage } = useSessionTimeline();
   const [activeConfirmOverlay, setActiveConfirmOverlay] =
     useState<PromptOverlayRequestEvent | null>(null);
 
@@ -38,6 +38,7 @@ export function App(): JSX.Element {
   }, [activeConfirmOverlay]);
 
   const handleSend = async (text: string): Promise<void> => {
+    addUserMessage(text);
     await window.pita.session.sendPrompt(text);
   };
 

@@ -7,6 +7,7 @@ interface UseSessionTimelineResult {
   runState: SessionRunState;
   steerCount: number;
   followUpCount: number;
+  addUserMessage: (text: string) => void;
 }
 
 const initialItems: TimelineItem[] = [];
@@ -33,7 +34,14 @@ export function useSessionTimeline(): UseSessionTimelineResult {
     };
   }, []);
 
-  return { items, runState, steerCount, followUpCount };
+  const addUserMessage = (text: string): void => {
+    setItems((previous) => [
+      ...previous,
+      { id: `user-${Date.now()}`, role: "user", text }
+    ]);
+  };
+
+  return { items, runState, steerCount, followUpCount, addUserMessage };
 }
 
 function applyTimelineEvent(

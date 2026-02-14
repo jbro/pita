@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PromptOverlayEvent, PromptOverlaySubmitRequest, SessionTimelineEvent } from "../../shared/ipc";
 import { App } from "../App";
@@ -88,5 +88,25 @@ describe("App streaming timeline", () => {
     expect(screen.getByRole("button", { name: "Allow" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Deny" })).toBeTruthy();
     expect(screen.queryByPlaceholderText("Ask Pi to continue…")).toBeNull();
+  });
+
+  it("appends a user message to the timeline when sendPrompt is called", async () => {
+    render(<App />);
+
+    const input = screen.getByPlaceholderText("Ask Pi to continue…");
+    fireEvent.change(input, { target: { value: "hello world" } });
+
+    const sendButton = screen.getByRole("button", { name: "Send" });
+    await act(async () => {
+      sendButton.click();
+    });
+
+    const userItems = screen.getAllByText("user");
+    expect(userItems.length).toBeGreaterThanOrEqual(1);
+    const helloMatches = screen.getAllByText("hello world");
+    expect(helloMatches.length).toBeGreaterThanOrEqual(1);
+    // Verify at least one match is in the timeline (a span), not just the textarea
+    const timelineMatch = helloMatches.find((el) => el.tagName === "SPAN");
+    expect(timelineMatch).toBeTruthy();
   });
 });
