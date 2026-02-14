@@ -1,26 +1,37 @@
-import { type KeyboardEvent, useState } from "react";
-import type { SessionRunState } from "../../shared/ipc";
+import { useEffect, type KeyboardEvent, useState } from "react";
+import type { PromptOverlayRequestEvent, SessionRunState } from "../../shared/ipc";
 
 interface PromptComposerPanelProps {
   runState?: SessionRunState;
   steerCount?: number;
   followUpCount?: number;
+  activeConfirmOverlay?: PromptOverlayRequestEvent | null;
   onSend?: (text: string) => Promise<void>;
   onSteer?: (text: string) => Promise<void>;
   onFollowUp?: (text: string) => Promise<void>;
   onAbort?: () => Promise<void>;
+  onConfirmOverlaySubmit?: (requestId: string) => Promise<void>;
+  onConfirmOverlayCancel?: (requestId: string) => Promise<void>;
 }
 
 export function PromptComposerPanel({
   runState = "idle",
   steerCount = 0,
   followUpCount = 0,
+  activeConfirmOverlay = null,
   onSend,
   onSteer,
   onFollowUp,
-  onAbort
+  onAbort,
+  onConfirmOverlaySubmit,
+  onConfirmOverlayCancel
 }: PromptComposerPanelProps): JSX.Element {
   const [text, setText] = useState("");
+  const [overlayError, setOverlayError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setOverlayError(null);
+  }, [activeConfirmOverlay?.requestId]);
 
   const isRunning = runState === "running";
   const trimmed = text.trim();
@@ -73,6 +84,52 @@ export function PromptComposerPanel({
       }
     }
   };
+
+  const handleConfirm = async (): Promise<void> => {
+    if (!activeConfirmOverlay || !onConfirmOverlaySubmit) return;
+
+    try {
+      await onConfirmOverlaySubmit(activeConfirmOverlay.requestId);
+    } catch {
+      setOverlayError("Could not submit confirmation. Try again.");
+    }
+  };
+
+  const handleCancel = async (): Promise<void> => {
+    if (!activeConfirmOverlay || !onConfirmOverlayCancel) return;
+
+    try {
+      await onConfirmOverlayCancel(activeConfirmOverlay.requestId);
+    } catch {
+      setOverlayError("Could not cancel confirmation. Try again.");
+    }
+  };
+
+  if (activeConfirmOverlay) {
+    return (
+      <section
+        className="panel composer-panel"
+        data-testid="prompt-composer-panel"
+        aria-label="Prompt composer panel"
+      >
+        <h2>{activeConfirmOverlay.title}</h2>
+        <p>{activeConfirmOverlay.message}</p>
+        {overlayError && (
+          <p data-testid="confirm-overlay-error" role="alert">
+            {overlayError}
+          </p>
+        )}
+        <div className="composer-actions">
+          <button type="button" onClick={() => void handleConfirm()}>
+            {activeConfirmOverlay.confirmLabel}
+          </button>
+          <button type="button" onClick={() => void handleCancel()}>
+            {activeConfirmOverlay.cancelLabel}
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

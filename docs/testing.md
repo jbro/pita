@@ -19,10 +19,10 @@ What they cover:
 - `bun run typecheck`: TypeScript checks for renderer and Electron/main code.
 - `bun run test`: Vitest + RTL DOM tests for shell and component placeholders.
 
-Focused confirm-only prompt overlay backend checks:
+Focused confirm-only prompt overlay checks:
 
 ```bash
-bun run test -- tests/main/preload-api.test.ts tests/main/preload-bridge.test.ts tests/main/orchestrator-service.test.ts tests/main/local-sdk-runtime-adapter.test.ts tests/main/session-ipc.test.ts
+bun run test -- tests/main/preload-api.test.ts tests/main/preload-bridge.test.ts tests/main/orchestrator-service.test.ts tests/main/local-sdk-runtime-adapter.test.ts tests/main/session-ipc.test.ts src/renderer/__tests__/app-streaming.test.tsx src/renderer/__tests__/prompt-composer-panel.test.tsx src/renderer/__tests__/prompt-composer-runtime.test.tsx
 ```
 
 ## Phase-end gate
@@ -64,7 +64,9 @@ Confirm:
 - Pressing Alt+Enter while running queues a follow-up.
 - Pending badge appears after steer or follow-up, shows separate steer and follow-up counts, and resets when idle.
 - No console/runtime errors or preload/IPC exceptions appear while running the prompt lifecycle.
-- No regressions in send/steer/follow-up/abort behavior with overlay backend code present.
+- Confirm overlay request path (when triggered) replaces the composer UI with confirm/cancel actions.
+- After overlay resolution, normal composer input/actions are restored.
+- No regressions in send/steer/follow-up/abort behavior with overlay code present.
 
 Notes:
 

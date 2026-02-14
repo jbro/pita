@@ -30,11 +30,10 @@ Implemented now:
 - automatic stub fallback when SDK bootstrap fails,
 - steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) behavior matching TUI parity,
 - queue status display in prompt composer with distinct steer vs follow-up counts,
-- confirm-only backend prompt overlay contract across adapter/orchestrator/IPC/preload (`request`, `submit/cancel`, `resolved`).
+- confirm-only prompt overlay flow across adapter/orchestrator/IPC/preload/renderer composer (`request`, `submit/cancel`, `resolved`).
 
 Not implemented yet:
 - multi-session UI controls,
-- renderer prompt overlay UX (this slice is backend-only),
 - non-confirm overlay kinds (`choice`, `freeform`) and richer extension prompt handling.
 
 ## Documentation note
