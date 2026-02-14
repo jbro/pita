@@ -1,2 +1,8 @@
 
 .worktrees/
+node_modules/
+dist/
+out/
+playwright-report/
+.vite/
+.turbo/
