@@ -22,7 +22,7 @@ Observed (if FAIL/UNCLEAR):
 ## Targeted behavior checks
 
 ### C2-R. Enter while running performs steer
-[X] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Steps:
 1. Send a prompt to start a run.
@@ -86,10 +86,10 @@ Observed (if FAIL/UNCLEAR):
 ## Optional proof capture
 
 ### P1. Save runtime selection line
-[ ] PASS  [ ] FAIL  [ ] UNCLEAR
+[x] PASS  [ ] FAIL  [ ] UNCLEAR
 
 Observed:
-- 
+- [pita] Runtime selection: selected=sdk requested=sdk-default stubMode=manual-abort fallback=no
 
 ### P2. Save one screenshot of queue badge with separate counts
 [ ] PASS  [ ] FAIL  [ ] UNCLEAR
@@ -101,11 +101,11 @@ Observed:
 
 ## Summary
 
-PASS:
-FAIL:
-UNCLEAR:
+PASS: 6
+FAIL: 0
+UNCLEAR: 0
 
 Deficits to feed next plan:
-1.
-2.
-3.
+1. None from targeted rerun.
+2. 
+3. 
