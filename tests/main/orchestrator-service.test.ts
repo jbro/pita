@@ -237,6 +237,30 @@ describe("OrchestratorService", () => {
     expect(idleCount).toBe(1);
   });
 
+  it("transitions error then idle when runtime run throws", async () => {
+    const runtime: RuntimeAdapter = {
+      async run(_text: string, callbacks: RuntimeCallbacks): Promise<void> {
+        callbacks.onStart("msg-1");
+        callbacks.onError(new Error("runtime failure"));
+        throw new Error("runtime failure");
+      },
+      abort: vi.fn()
+    };
+
+    const service = new OrchestratorService(runtime);
+    const stateEvents: string[] = [];
+
+    service.onTimelineEvent((event) => {
+      if (event.type === "state") {
+        stateEvents.push(event.state);
+      }
+    });
+
+    await expect(service.sendPrompt("hi")).rejects.toThrow("runtime failure");
+
+    expect(stateEvents).toEqual(["running", "error", "idle"]);
+  });
+
   it("stale requestId submit and cancel are rejected", () => {
     const runtime: RuntimeAdapter = {
       run: vi.fn(),
