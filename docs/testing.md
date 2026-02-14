@@ -22,7 +22,7 @@ What they cover:
 Focused confirm-only prompt overlay checks:
 
 ```bash
-bun run test -- tests/main/preload-api.test.ts tests/main/preload-bridge.test.ts tests/main/orchestrator-service.test.ts tests/main/local-sdk-runtime-adapter.test.ts tests/main/session-ipc.test.ts src/renderer/__tests__/app-streaming.test.tsx src/renderer/__tests__/prompt-composer-panel.test.tsx src/renderer/__tests__/prompt-composer-runtime.test.tsx
+bun run test -- tests/main/preload-api.test.ts tests/main/preload-bridge.test.ts tests/main/orchestrator-service.test.ts tests/main/local-sdk-runtime-adapter.test.ts tests/main/session-ipc.test.ts tests/main/ipc-channel-sync.test.ts src/renderer/__tests__/app-streaming.test.tsx src/renderer/__tests__/prompt-composer-panel.test.tsx src/renderer/__tests__/prompt-composer-runtime.test.tsx
 ```
 
 ## Phase-end gate

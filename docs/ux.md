@@ -18,7 +18,7 @@ Shows:
 
 Behavior:
 - live streaming updates
-- collapse/expand tool output
+- collapse/expand tool output (deferred; current UI shows a flat list)
 - clear state transitions (running, idle, aborting, error)
 
 ### Prompt Composer (Bottom)
