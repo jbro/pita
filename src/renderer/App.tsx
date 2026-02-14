@@ -12,7 +12,13 @@ export function App(): JSX.Element {
     useState<PromptOverlayRequestEvent | null>(null);
 
   useEffect(() => {
-    const unsubscribe = window.pita.session.onPromptOverlayEvent((event: PromptOverlayEvent) => {
+    const sessionApi = window.pita?.session;
+
+    if (!sessionApi) {
+      return;
+    }
+
+    const unsubscribe = sessionApi.onPromptOverlayEvent((event: PromptOverlayEvent) => {
       if (event.type === "prompt_overlay_request" && event.kind === "confirm") {
         setActiveConfirmOverlay(event);
         return;
