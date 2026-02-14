@@ -8,7 +8,7 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 
 - Desktop experience for Pi session control
 - Timeline-first interface for session activity
-- Prompt composer wired to single-session send/abort controls
+- Prompt composer wired to single-session send/steer/follow-up/abort controls
 - Streamed timeline updates from main-process runtime events
 - Command palette and keyboard shortcut workflows
 - Multi-session architecture with foreground control semantics

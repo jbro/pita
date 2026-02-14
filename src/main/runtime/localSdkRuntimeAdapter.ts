@@ -9,6 +9,9 @@ export type LocalSdkEvent =
 export interface LocalSdkSession {
   sendPrompt(text: string): Promise<void>;
   abort(): Promise<void> | void;
+  steer(text: string): Promise<void> | void;
+  followUp(text: string): Promise<void> | void;
+  clearQueue(): { steering: string[]; followUp: string[] };
   onEvent(listener: (event: LocalSdkEvent) => void): () => void;
 }
 
@@ -65,6 +68,18 @@ export class LocalSdkRuntimeAdapter implements RuntimeAdapter {
   public async abort(): Promise<void> {
     await this.session.abort();
   }
+
+  public steer(text: string): void {
+    void this.session.steer(text);
+  }
+
+  public followUp(text: string): void {
+    void this.session.followUp(text);
+  }
+
+  public clearQueue(): { steering: string[]; followUp: string[] } {
+    return this.session.clearQueue();
+  }
 }
 
 export async function createLocalSdkSession(
@@ -101,12 +116,35 @@ export async function createLocalSdkSession(
 
   const onEvent = createEventSubscription(rawSession as Record<string, unknown>);
 
+  const steer =
+    findFunction(rawSession as Record<string, unknown>, ["steer"]) ?? (() => undefined);
+
+  const followUp =
+    findFunction(rawSession as Record<string, unknown>, ["followUp"]) ?? (() => undefined);
+
+  const clearQueue =
+    findFunction(rawSession as Record<string, unknown>, ["clearQueue"]) ??
+    (() => ({ steering: [], followUp: [] }));
+
   return {
     async sendPrompt(text): Promise<void> {
       await Promise.resolve(sendPrompt(text));
     },
     async abort(): Promise<void> {
       await Promise.resolve(abort());
+    },
+    steer(text): void {
+      void steer(text);
+    },
+    followUp(text): void {
+      void followUp(text);
+    },
+    clearQueue(): { steering: string[]; followUp: string[] } {
+      const result = clearQueue();
+      if (result && typeof result === "object" && Array.isArray((result as Record<string, unknown>).steering)) {
+        return result as { steering: string[]; followUp: string[] };
+      }
+      return { steering: [], followUp: [] };
     },
     onEvent
   };

@@ -29,11 +29,13 @@ Responsibilities:
 - Handle command palette and keyboard actions.
 - Display streaming updates and tool blocks.
 
-Phase 1B implementation note:
-- Renderer timeline state is event-driven through a session timeline hook.
-- Prompt composer send/abort controls are wired to preload session APIs.
+Implementation notes:
+- Timeline state is event-driven through a session timeline hook.
+- Prompt composer controls are wired to preload session APIs.
+- During streaming, Enter triggers `steer` and Alt+Enter triggers `followUp`. When idle, both submit a normal prompt.
+- A pending queue count badge appears when steered or follow-up messages are queued.
 
-It does not directly own Pi runtime state.
+The renderer does not directly own Pi runtime state.
 
 ### 2. Main Process (Electron)
 
@@ -42,8 +44,9 @@ Responsibilities:
 - IPC boundary to renderer.
 - Command dispatch to orchestration layer.
 
-Phase 1B implementation note:
+Implementation notes:
 - Session IPC handlers are registered during startup and forward orchestrator timeline events to the active window.
+- IPC channels cover `sendPrompt`, `abort`, `steer`, `followUp`, `clearQueue`, and `timelineEvent`.
 - Runtime selection is SDK-first at startup.
 - Operators can force stub runtime with `PITA_RUNTIME_KIND=stub`.
 - Stub runtime mode is selected via `PITA_STUB_RUNTIME_MODE` (`default` or `manual-abort`) to keep manual abort smoke deterministic without slowing all test paths.
@@ -58,9 +61,10 @@ Responsibilities:
 - Normalize events for UI consumption.
 - Buffer background events and replay summaries.
 
-Phase 1B implementation note:
-- A thin single-session `OrchestratorService` is now wired for `sendPrompt` and `abort`.
-- It emits normalized `state`, `response.start`, `response.chunk`, `response.end`, `response.abort`, and `error` events.
+Implementation notes:
+- A thin single-session `OrchestratorService` is wired for `sendPrompt`, `abort`, `steer`, `followUp`, and `clearQueue`.
+- It emits normalized `state`, `response.start`, `response.chunk`, `response.end`, `response.abort`, `error`, and `queue.status` events.
+- `steer` and `followUp` delegate to the runtime adapter and emit `queue.status` with current pending counts. Counts reset when the run completes.
 
 ### 4. Agent Adapters
 

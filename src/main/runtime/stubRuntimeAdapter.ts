@@ -17,10 +17,10 @@ export function resolveStubRuntimeMode(env: NodeJS.ProcessEnv = process.env): St
 
 export function createStubRuntimeAdapter(mode: StubRuntimeMode = resolveStubRuntimeMode()): RuntimeAdapter {
   if (mode === "manual-abort") {
-    return createManualAbortRuntimeAdapter();
+    return withQueueSupport(createManualAbortRuntimeAdapter());
   }
 
-  return {
+  return withQueueSupport({
     async run(_text, callbacks): Promise<void> {
       const messageId = `msg-${Date.now()}`;
       callbacks.onStart(messageId);
@@ -30,7 +30,27 @@ export function createStubRuntimeAdapter(mode: StubRuntimeMode = resolveStubRunt
     abort(): void {
       return;
     }
+  });
+}
+
+function withQueueSupport(adapter: RuntimeAdapter): RuntimeAdapter {
+  const steerQueue: string[] = [];
+  const followUpQueue: string[] = [];
+
+  adapter.steer = (text: string) => {
+    steerQueue.push(text);
   };
+  adapter.followUp = (text: string) => {
+    followUpQueue.push(text);
+  };
+  adapter.clearQueue = () => {
+    const result = { steering: [...steerQueue], followUp: [...followUpQueue] };
+    steerQueue.length = 0;
+    followUpQueue.length = 0;
+    return result;
+  };
+
+  return adapter;
 }
 
 function createManualAbortRuntimeAdapter(): RuntimeAdapter {

@@ -9,4 +9,23 @@ describe("PromptComposerPanel", () => {
     expect(screen.getByRole("button", { name: /send/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /abort/i })).toBeTruthy();
   });
+
+  it("shows Steer label when running", () => {
+    render(<PromptComposerPanel runState="running" />);
+
+    expect(screen.getByRole("button", { name: /steer/i })).toBeTruthy();
+  });
+
+  it("shows pending count when steerCount + followUpCount > 0", () => {
+    render(<PromptComposerPanel steerCount={1} followUpCount={2} />);
+
+    const badge = screen.getByTestId("pending-count");
+    expect(badge.textContent).toBe("3 queued");
+  });
+
+  it("hides pending count when both counts are zero", () => {
+    render(<PromptComposerPanel steerCount={0} followUpCount={0} />);
+
+    expect(screen.queryByTestId("pending-count")).toBeNull();
+  });
 });

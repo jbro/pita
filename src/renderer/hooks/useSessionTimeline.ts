@@ -5,6 +5,8 @@ import type { TimelineItem } from "../components/TimelinePanel";
 interface UseSessionTimelineResult {
   items: TimelineItem[];
   runState: SessionRunState;
+  steerCount: number;
+  followUpCount: number;
 }
 
 const initialItems: TimelineItem[] = [];
@@ -12,6 +14,8 @@ const initialItems: TimelineItem[] = [];
 export function useSessionTimeline(): UseSessionTimelineResult {
   const [items, setItems] = useState<TimelineItem[]>(initialItems);
   const [runState, setRunState] = useState<SessionRunState>("idle");
+  const [steerCount, setSteerCount] = useState(0);
+  const [followUpCount, setFollowUpCount] = useState(0);
 
   useEffect(() => {
     const sessionApi = window.pita?.session;
@@ -21,7 +25,7 @@ export function useSessionTimeline(): UseSessionTimelineResult {
     }
 
     const unsubscribe = sessionApi.onTimelineEvent((event) => {
-      applyTimelineEvent(event, setItems, setRunState);
+      applyTimelineEvent(event, setItems, setRunState, setSteerCount, setFollowUpCount);
     });
 
     return () => {
@@ -29,17 +33,28 @@ export function useSessionTimeline(): UseSessionTimelineResult {
     };
   }, []);
 
-  return { items, runState };
+  return { items, runState, steerCount, followUpCount };
 }
 
 function applyTimelineEvent(
   event: SessionTimelineEvent,
   setItems: Dispatch<SetStateAction<TimelineItem[]>>,
-  setRunState: Dispatch<SetStateAction<SessionRunState>>
+  setRunState: Dispatch<SetStateAction<SessionRunState>>,
+  setSteerCount: Dispatch<SetStateAction<number>>,
+  setFollowUpCount: Dispatch<SetStateAction<number>>
 ): void {
   switch (event.type) {
     case "state": {
       setRunState(event.state);
+      if (event.state === "idle") {
+        setSteerCount(0);
+        setFollowUpCount(0);
+      }
+      return;
+    }
+    case "queue.status": {
+      setSteerCount(event.steerCount);
+      setFollowUpCount(event.followUpCount);
       return;
     }
     case "response.start": {

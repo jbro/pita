@@ -19,6 +19,9 @@ describe("App streaming timeline", () => {
         session: {
           sendPrompt(text: string): Promise<void>;
           abort(): Promise<void>;
+          steer(text: string): Promise<void>;
+          followUp(text: string): Promise<void>;
+          clearQueue(): Promise<{ steering: string[]; followUp: string[] }>;
           onTimelineEvent(listener: (event: SessionTimelineEvent) => void): () => void;
         };
       };
@@ -27,6 +30,9 @@ describe("App streaming timeline", () => {
       session: {
         sendPrompt,
         abort,
+        steer: vi.fn(async () => undefined),
+        followUp: vi.fn(async () => undefined),
+        clearQueue: vi.fn(async () => ({ steering: [], followUp: [] })),
         onTimelineEvent: vi.fn((listener: (event: SessionTimelineEvent) => void) => {
           timelineListener = listener;
           return () => undefined;
