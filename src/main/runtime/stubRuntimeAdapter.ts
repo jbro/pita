@@ -1,0 +1,88 @@
+import type { RuntimeAdapter, RuntimeCallbacks } from "../orchestrator/OrchestratorService";
+
+export type StubRuntimeMode = "default" | "manual-abort";
+
+const MANUAL_ABORT_CHUNK_INTERVAL_MS = 400;
+const MANUAL_ABORT_CHUNKS = [
+  "stub response chunk 1",
+  "stub response chunk 2",
+  "stub response chunk 3",
+  "stub response chunk 4",
+  "stub response chunk 5"
+];
+
+export function resolveStubRuntimeMode(env: NodeJS.ProcessEnv = process.env): StubRuntimeMode {
+  return env.PITA_STUB_RUNTIME_MODE === "manual-abort" ? "manual-abort" : "default";
+}
+
+export function createStubRuntimeAdapter(mode: StubRuntimeMode = resolveStubRuntimeMode()): RuntimeAdapter {
+  if (mode === "manual-abort") {
+    return createManualAbortRuntimeAdapter();
+  }
+
+  return {
+    async run(_text, callbacks): Promise<void> {
+      const messageId = `msg-${Date.now()}`;
+      callbacks.onStart(messageId);
+      callbacks.onChunk(messageId, "stub response");
+      callbacks.onEnd(messageId);
+    },
+    abort(): void {
+      return;
+    }
+  };
+}
+
+function createManualAbortRuntimeAdapter(): RuntimeAdapter {
+  let activeRun:
+    | {
+        messageId: string;
+        callbacks: RuntimeCallbacks;
+        index: number;
+        interval: ReturnType<typeof setInterval>;
+        resolve: () => void;
+      }
+    | undefined;
+
+  return {
+    run(_text, callbacks): Promise<void> {
+      const messageId = `msg-${Date.now()}`;
+      callbacks.onStart(messageId);
+
+      return new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+          if (!activeRun) {
+            clearInterval(interval);
+            return;
+          }
+
+          const chunk = MANUAL_ABORT_CHUNKS[activeRun.index];
+
+          if (!chunk) {
+            clearInterval(interval);
+            callbacks.onEnd(messageId);
+            activeRun = undefined;
+            resolve();
+            return;
+          }
+
+          callbacks.onChunk(messageId, chunk);
+          activeRun.index += 1;
+        }, MANUAL_ABORT_CHUNK_INTERVAL_MS);
+
+        activeRun = { messageId, callbacks, index: 0, interval, resolve };
+      });
+    },
+
+    abort(): void {
+      if (!activeRun) {
+        return;
+      }
+
+      clearInterval(activeRun.interval);
+      activeRun.callbacks.onError(new Error("aborted"));
+      activeRun.resolve();
+      activeRun = undefined;
+    }
+  };
+}
