@@ -28,6 +28,9 @@ Remaining:
 
 ## Phase 2 — Session and Workspace Expansion
 
+Related concept work:
+- `docs/future/file-context-and-review-steering-concept.md` (file viewer, context references, comment-based steering, virtual file diff workflows)
+
 - Mission-control session overview UI.
 - Session selection and lifecycle management in UI.
 - Worktree/branch visibility in app.
