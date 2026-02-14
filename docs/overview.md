@@ -29,11 +29,13 @@ Implemented now:
 - explicit stub override (`PITA_RUNTIME_KIND=stub`) with deterministic `manual-abort` mode for smoke checks,
 - automatic stub fallback when SDK bootstrap fails,
 - steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) behavior matching TUI parity,
-- queue status display (pending message count) in prompt composer.
+- queue status display (pending message count) in prompt composer,
+- confirm-only backend prompt overlay contract across adapter/orchestrator/IPC/preload (`request`, `submit/cancel`, `resolved`).
 
 Not implemented yet:
 - multi-session UI controls,
-- deeper local SDK parity work beyond initial session wiring (for example extension prompt flows and richer event-role coverage).
+- renderer prompt overlay UX (this slice is backend-only),
+- non-confirm overlay kinds (`choice`, `freeform`) and richer extension prompt handling.
 
 ## Documentation note
 

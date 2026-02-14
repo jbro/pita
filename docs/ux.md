@@ -60,6 +60,8 @@ V1 provides fixed default keybindings. User-editable keymaps come later.
 
 ## Deferred UX (Post-V1)
 
+Note: backend support for confirm-only prompt overlay events exists. The renderer overlay UX listed below is still pending.
+
 - Mission-control session overview.
 - Resizable side panels (file tree, git, remote agents).
 - Advanced text and diff viewers integrated in timeline.

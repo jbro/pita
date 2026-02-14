@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import type { PromptOverlayRequestEvent } from "../../src/shared/ipc";
 import {
   LocalSdkRuntimeAdapter,
   type LocalSdkEvent,
@@ -57,5 +58,79 @@ describe("LocalSdkRuntimeAdapter", () => {
     await adapter.abort();
 
     expect(session.abort).toHaveBeenCalledTimes(1);
+  });
+
+  it("forwards confirm request events to orchestrator-facing callback", () => {
+    let overlayListener: ((request: PromptOverlayRequestEvent) => void) | undefined;
+
+    const session: LocalSdkSession = {
+      ...createSession([]),
+      onPromptOverlayRequest(listener) {
+        overlayListener = listener;
+        return () => {
+          overlayListener = undefined;
+        };
+      },
+      resolvePromptOverlay: vi.fn()
+    };
+
+    const adapter = new LocalSdkRuntimeAdapter(session);
+    const requestListener = vi.fn();
+
+    adapter.onPromptOverlayRequest?.(requestListener);
+
+    const request: PromptOverlayRequestEvent = {
+      type: "prompt_overlay_request",
+      requestId: "overlay-1",
+      kind: "confirm",
+      title: "Confirm",
+      message: "Proceed?",
+      confirmLabel: "Yes",
+      cancelLabel: "No"
+    };
+
+    overlayListener?.(request);
+
+    expect(requestListener).toHaveBeenCalledTimes(1);
+    expect(requestListener.mock.calls[0]?.[0]).toEqual(request);
+    expect(typeof requestListener.mock.calls[0]?.[1]).toBe("function");
+  });
+
+  it("resolves submit and cancel decisions back to SDK bridge", () => {
+    let overlayListener: ((request: PromptOverlayRequestEvent) => void) | undefined;
+    const resolvePromptOverlay = vi.fn();
+
+    const session: LocalSdkSession = {
+      ...createSession([]),
+      onPromptOverlayRequest(listener) {
+        overlayListener = listener;
+        return () => {
+          overlayListener = undefined;
+        };
+      },
+      resolvePromptOverlay
+    };
+
+    const adapter = new LocalSdkRuntimeAdapter(session);
+    const requestListener = vi.fn();
+
+    adapter.onPromptOverlayRequest?.(requestListener);
+
+    overlayListener?.({
+      type: "prompt_overlay_request",
+      requestId: "overlay-1",
+      kind: "confirm",
+      title: "Confirm",
+      message: "Proceed?",
+      confirmLabel: "Yes",
+      cancelLabel: "No"
+    });
+
+    const resolver = requestListener.mock.calls[0]?.[1] as (decision: "confirm" | "cancel") => void;
+    resolver("confirm");
+    resolver("cancel");
+
+    expect(resolvePromptOverlay).toHaveBeenNthCalledWith(1, "overlay-1", "confirm");
+    expect(resolvePromptOverlay).toHaveBeenNthCalledWith(2, "overlay-1", "cancel");
   });
 });

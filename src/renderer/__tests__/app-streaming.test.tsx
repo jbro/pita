@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { SessionTimelineEvent } from "../../shared/ipc";
+import type { PromptOverlayEvent, PromptOverlaySubmitRequest, SessionTimelineEvent } from "../../shared/ipc";
 import { App } from "../App";
 
 describe("App streaming timeline", () => {
@@ -23,6 +23,9 @@ describe("App streaming timeline", () => {
           followUp(text: string): Promise<void>;
           clearQueue(): Promise<{ steering: string[]; followUp: string[] }>;
           onTimelineEvent(listener: (event: SessionTimelineEvent) => void): () => void;
+          onPromptOverlayEvent(listener: (event: PromptOverlayEvent) => void): () => void;
+          submitPromptOverlay(request: PromptOverlaySubmitRequest): Promise<void>;
+          cancelPromptOverlay(request: { requestId: string }): Promise<void>;
         };
       };
     }).pita = {
@@ -36,7 +39,10 @@ describe("App streaming timeline", () => {
         onTimelineEvent: vi.fn((listener: (event: SessionTimelineEvent) => void) => {
           timelineListener = listener;
           return () => undefined;
-        })
+        }),
+        onPromptOverlayEvent: vi.fn(() => () => undefined),
+        submitPromptOverlay: vi.fn(async () => undefined),
+        cancelPromptOverlay: vi.fn(async () => undefined)
       }
     };
   });

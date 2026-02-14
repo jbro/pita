@@ -20,6 +20,7 @@ Completed:
 - Deterministic manual abort smoke path via staged `manual-abort` stub runtime mode.
 - Local SDK embedding for primary agent with stub fallback.
 - Steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) with pending count display.
+- Confirm-only prompt overlay backend contract across runtime adapter, orchestrator, IPC, and preload.
 
 Remaining:
 - Command palette behavior beyond placeholder.
@@ -35,7 +36,7 @@ Related concept work:
 - Session selection and lifecycle management in UI.
 - Worktree/branch visibility in app.
 - Initial side-panel framework.
-- Interactive agent prompt overlay (extension-driven):
+- Interactive agent prompt overlay (extension-driven UI on top of the backend contract):
   - Multiple-choice options shown as clickable buttons.
   - Keyboard navigation with arrow keys and Enter.
   - Numeric quick-select shortcuts (for example `1`, `2`, `3`).

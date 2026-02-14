@@ -1,4 +1,9 @@
-import type { SessionRunState, SessionTimelineEvent } from "../../shared/ipc";
+import type {
+  PromptOverlayEvent,
+  PromptOverlayRequestEvent,
+  SessionRunState,
+  SessionTimelineEvent
+} from "../../shared/ipc";
 
 export interface RuntimeCallbacks {
   onStart(messageId: string): void;
@@ -7,23 +12,43 @@ export interface RuntimeCallbacks {
   onError(error: Error): void;
 }
 
+export type PromptOverlayDecision = "confirm" | "cancel";
+export type PromptOverlayResolver = (decision: PromptOverlayDecision) => void;
+export type PromptOverlayRequestListener = (
+  request: PromptOverlayRequestEvent,
+  resolve: PromptOverlayResolver
+) => void;
+
 export interface RuntimeAdapter {
   run(text: string, callbacks: RuntimeCallbacks): Promise<void>;
   abort(): void;
   steer?(text: string): void;
   followUp?(text: string): void;
   clearQueue?(): { steering: string[]; followUp: string[] };
+  onPromptOverlayRequest?(listener: PromptOverlayRequestListener): () => void;
 }
 
 type TimelineListener = (event: SessionTimelineEvent) => void;
+type PromptOverlayListener = (event: PromptOverlayEvent) => void;
 
 export class OrchestratorService {
   private state: SessionRunState = "idle";
   private steerCount = 0;
   private followUpCount = 0;
   private readonly listeners = new Set<TimelineListener>();
+  private readonly promptOverlayListeners = new Set<PromptOverlayListener>();
+  private activePromptOverlay:
+    | {
+        request: PromptOverlayRequestEvent;
+        resolve: PromptOverlayResolver;
+      }
+    | undefined;
 
-  public constructor(private readonly runtime: RuntimeAdapter) {}
+  public constructor(private readonly runtime: RuntimeAdapter) {
+    this.runtime.onPromptOverlayRequest?.((request, resolve) => {
+      this.requestPromptOverlay(request, resolve);
+    });
+  }
 
   public onTimelineEvent(listener: TimelineListener): () => void {
     this.listeners.add(listener);
@@ -31,6 +56,47 @@ export class OrchestratorService {
     return () => {
       this.listeners.delete(listener);
     };
+  }
+
+  public onPromptOverlayEvent(listener: PromptOverlayListener): () => void {
+    this.promptOverlayListeners.add(listener);
+
+    return () => {
+      this.promptOverlayListeners.delete(listener);
+    };
+  }
+
+  public requestPromptOverlay(request: PromptOverlayRequestEvent, resolve: PromptOverlayResolver = () => undefined): void {
+    if (this.activePromptOverlay) {
+      throw new Error(`Prompt overlay request ${request.requestId} rejected: another request is already active.`);
+    }
+
+    this.activePromptOverlay = { request, resolve };
+    this.emitPromptOverlay(request);
+  }
+
+  public submitPromptOverlay(requestId: string, decision: PromptOverlayDecision): void {
+    const activeRequest = this.activePromptOverlay;
+
+    if (!activeRequest || activeRequest.request.requestId !== requestId) {
+      throw new Error(`No active prompt overlay request for requestId ${requestId}`);
+    }
+
+    activeRequest.resolve(decision);
+    this.activePromptOverlay = undefined;
+    this.emitPromptOverlay({ type: "prompt_overlay_resolved", requestId, status: "submitted" });
+  }
+
+  public cancelPromptOverlay(requestId: string): void {
+    const activeRequest = this.activePromptOverlay;
+
+    if (!activeRequest || activeRequest.request.requestId !== requestId) {
+      throw new Error(`No active prompt overlay request for requestId ${requestId}`);
+    }
+
+    activeRequest.resolve("cancel");
+    this.activePromptOverlay = undefined;
+    this.emitPromptOverlay({ type: "prompt_overlay_resolved", requestId, status: "cancelled" });
   }
 
   public async sendPrompt(text: string): Promise<void> {
@@ -116,6 +182,12 @@ export class OrchestratorService {
 
   private emit(event: SessionTimelineEvent): void {
     for (const listener of this.listeners) {
+      listener(event);
+    }
+  }
+
+  private emitPromptOverlay(event: PromptOverlayEvent): void {
+    for (const listener of this.promptOverlayListeners) {
       listener(event);
     }
   }
