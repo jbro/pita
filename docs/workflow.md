@@ -200,17 +200,17 @@ Run phase-end gates now in this worktree and report exact output.
 
 Required gates:
 1) Playwright Electron smoke test
-   - npm run test:e2e
+   - bun run test:e2e
 2) Manual smoke checklist
    - Launch app (dev run)
    - Confirm window opens
    - Confirm prompt send action is callable
    - Confirm timeline updates from runtime events
-   - Confirm abort is visible/callable during run
+   - Confirm abort is visible; confirm callability when a long-running run is available
 
 Also include:
-- npm run typecheck
-- npm run test
+- bun run typecheck
+- bun run test
 
 After running all gates, summarize pass/fail.
 If all gates pass, run /refine-docs and update any docs that should reflect the completed work.

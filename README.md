@@ -17,10 +17,14 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 
 ## Getting Started
 
+Prerequisite: install Bun (`https://bun.sh`) and ensure `bun` is on your `PATH`.
+
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
+
+Bun is the authoritative package manager and task runner for this repository.
 
 For verification commands, see [docs/testing.md](docs/testing.md).
 
