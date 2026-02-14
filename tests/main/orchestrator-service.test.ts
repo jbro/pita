@@ -105,7 +105,7 @@ describe("OrchestratorService", () => {
     const service = new OrchestratorService(runtime);
     const overlayEvents: PromptOverlayEvent[] = [];
 
-    (service as any).onPromptOverlayEvent((event: PromptOverlayEvent) => {
+    service.onPromptOverlayEvent((event: PromptOverlayEvent) => {
       overlayEvents.push(event);
     });
 
@@ -119,7 +119,7 @@ describe("OrchestratorService", () => {
       cancelLabel: "No"
     };
 
-    (service as any).requestPromptOverlay(request, vi.fn());
+    service.requestPromptOverlay(request, vi.fn());
 
     expect(overlayEvents).toEqual([request]);
   });
@@ -135,11 +135,11 @@ describe("OrchestratorService", () => {
     const service = new OrchestratorService(runtime);
     const overlayEvents: PromptOverlayEvent[] = [];
 
-    (service as any).onPromptOverlayEvent((event: PromptOverlayEvent) => {
+    service.onPromptOverlayEvent((event: PromptOverlayEvent) => {
       overlayEvents.push(event);
     });
 
-    (service as any).requestPromptOverlay(
+    service.requestPromptOverlay(
       {
         type: "prompt_overlay_request",
         requestId: "overlay-1",
@@ -152,7 +152,7 @@ describe("OrchestratorService", () => {
       resolveOverlay
     );
 
-    (service as any).submitPromptOverlay("overlay-1", "confirm");
+    service.submitPromptOverlay("overlay-1", "confirm");
 
     expect(resolveOverlay).toHaveBeenCalledWith("confirm");
     expect(overlayEvents.at(-1)).toEqual({
@@ -173,11 +173,11 @@ describe("OrchestratorService", () => {
     const service = new OrchestratorService(runtime);
     const overlayEvents: PromptOverlayEvent[] = [];
 
-    (service as any).onPromptOverlayEvent((event: PromptOverlayEvent) => {
+    service.onPromptOverlayEvent((event: PromptOverlayEvent) => {
       overlayEvents.push(event);
     });
 
-    (service as any).requestPromptOverlay(
+    service.requestPromptOverlay(
       {
         type: "prompt_overlay_request",
         requestId: "overlay-1",
@@ -190,7 +190,7 @@ describe("OrchestratorService", () => {
       resolveOverlay
     );
 
-    (service as any).cancelPromptOverlay("overlay-1");
+    service.cancelPromptOverlay("overlay-1");
 
     expect(resolveOverlay).toHaveBeenCalledWith("cancel");
     expect(overlayEvents.at(-1)).toEqual({
@@ -209,11 +209,11 @@ describe("OrchestratorService", () => {
     const service = new OrchestratorService(runtime);
 
     expect(() => {
-      (service as any).submitPromptOverlay("stale-id", "confirm");
+      service.submitPromptOverlay("stale-id", "confirm");
     }).toThrow("No active prompt overlay request for requestId stale-id");
 
     expect(() => {
-      (service as any).cancelPromptOverlay("stale-id");
+      service.cancelPromptOverlay("stale-id");
     }).toThrow("No active prompt overlay request for requestId stale-id");
   });
 });
