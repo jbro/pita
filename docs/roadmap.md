@@ -24,6 +24,7 @@ Remaining:
 - Command palette behavior beyond placeholder.
 - Foreground-slot/background-queue orchestration parity work.
 - Multi-session behavior beyond architecture-level design.
+- Make manual abort smoke deterministic (for example, slower or staged stub runtime, or explicit test mode).
 
 ## Phase 2 — Session and Workspace Expansion
 
