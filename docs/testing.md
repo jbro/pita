@@ -19,6 +19,12 @@ What they cover:
 - `bun run typecheck`: TypeScript checks for renderer and Electron/main code.
 - `bun run test`: Vitest + RTL DOM tests for shell and component placeholders.
 
+Focused confirm-only prompt overlay backend checks:
+
+```bash
+bun run test -- tests/main/preload-api.test.ts tests/main/preload-bridge.test.ts tests/main/orchestrator-service.test.ts tests/main/local-sdk-runtime-adapter.test.ts tests/main/session-ipc.test.ts
+```
+
 ## Phase-end gate
 
 Run the Electron smoke test:

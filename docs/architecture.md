@@ -46,7 +46,7 @@ Responsibilities:
 
 Implementation notes:
 - Session IPC handlers are registered during startup and forward orchestrator timeline events to the active window.
-- IPC channels cover `sendPrompt`, `abort`, `steer`, `followUp`, `clearQueue`, and `timelineEvent`.
+- IPC channels cover `sendPrompt`, `abort`, `steer`, `followUp`, `clearQueue`, `timelineEvent`, `promptOverlaySubmit`, `promptOverlayCancel`, and `promptOverlayEvent`.
 - Runtime selection is SDK-first at startup.
 - Operators can force stub runtime with `PITA_RUNTIME_KIND=stub`.
 - Stub runtime mode is selected via `PITA_STUB_RUNTIME_MODE` (`default` or `manual-abort`) to keep manual abort smoke deterministic without slowing all test paths.
@@ -62,8 +62,9 @@ Responsibilities:
 - Buffer background events and replay summaries.
 
 Implementation notes:
-- A thin single-session `OrchestratorService` is wired for `sendPrompt`, `abort`, `steer`, `followUp`, and `clearQueue`.
+- A thin single-session `OrchestratorService` is wired for `sendPrompt`, `abort`, `steer`, `followUp`, `clearQueue`, and confirm-only prompt overlay lifecycle (`request`, `submit`, `cancel`).
 - It emits normalized `state`, `response.start`, `response.chunk`, `response.end`, `response.abort`, `error`, and `queue.status` events.
+- It also emits prompt overlay events: `prompt_overlay_request` and `prompt_overlay_resolved`.
 - `steer` and `followUp` delegate to the runtime adapter and emit `queue.status` with current pending counts. Counts reset when the run completes.
 
 ### 4. Agent Adapters
@@ -73,6 +74,7 @@ A shared interface hides runtime differences.
 #### `LocalSdkAgentAdapter` (v1)
 - Uses `createAgentSession()` and `SessionManager`.
 - Powers the rich foreground local experience.
+- Includes optional confirm-only prompt overlay hooks when exposed by the SDK session bridge.
 
 #### `RpcWorkerAgentAdapter` (later / optional)
 - Runs workers over Pi RPC.
@@ -159,6 +161,8 @@ This supports future self-steering and remote orchestration without forcing a co
 
 ## Extension UI Bridge (Phase 2)
 
+Current status: backend bridge is implemented for a confirm-only slice (runtime adapter -> orchestrator -> IPC -> preload). Renderer overlay UX is not implemented yet.
+
 To support structured agent questions in the desktop UI, add an extension UI bridge between Pi runtime events and renderer overlays.
 
 Responsibilities:
@@ -176,6 +180,12 @@ Input support requirements:
 If extension UI requests are unavailable, the system falls back to plain text interaction.
 
 ### Prompt Overlay Event Contract (Draft)
+
+Implemented subset today:
+- `prompt_overlay_request` with `kind: "confirm"`
+- `prompt_overlay_submit` via IPC payload `{ requestId, decision }` where decision is `"confirm" | "cancel"`
+- `prompt_overlay_cancel` via IPC payload `{ requestId }`
+- `prompt_overlay_resolved` with status `submitted` or `cancelled`
 
 | Event | Direction | Required Fields | Notes |
 |---|---|---|---|
