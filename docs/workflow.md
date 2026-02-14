@@ -153,7 +153,9 @@ When the implementation session reports completion, prepare the next **feedback 
 
 Rule: after every review response (approve/fix/next batch), copy the exact follow-up prompt to clipboard by default.
 
-Exception: if the follow-up is only "approved, stop and close the sub-session", do not copy a prompt; report approval directly and proceed to cleanup/integration.
+New completion rule: when implementation is approved, copy a follow-up prompt that tells the sub-session to run `/refine-docs`, commit any resulting doc updates, and report back.
+
+Only after that `/refine-docs` completion report is reviewed and accepted, proceed to merge and cleanup.
 
 When implementation is complete, prepare a **phase-end gates prompt** and copy it with `wl-copy` the same way.
 
@@ -185,13 +187,15 @@ If all gates pass, run /refine-docs and update any docs that should reflect the 
 Then stop for review.
 ```
 
-### 5) Wait for gate results, then review and integrate
+### 5) Wait for gate results, then review, refine docs, and integrate
 
 When told gates passed:
 
 1. Review worktree changes carefully.
-2. If quality is acceptable, merge branch into `main`.
-3. Clean up branch and worktree.
+2. If quality is acceptable, copy a follow-up prompt instructing the sub-session to run `/refine-docs`, commit doc updates, and report back.
+3. Review the `/refine-docs` commit(s).
+4. If still acceptable, merge branch into `main`.
+5. Clean up branch and worktree.
 
 Example cleanup flow:
 
