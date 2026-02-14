@@ -17,6 +17,8 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 
 ## Getting Started
 
+Prerequisite: install Bun (`https://bun.sh`) and ensure `bun` is on your `PATH`.
+
 ```bash
 bun install
 bun run dev

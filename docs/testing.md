@@ -57,6 +57,7 @@ Notes:
 
 - `bun run dev` is long-running by design.
 - If scripting this check, use a timeout and terminate cleanly after confirmation.
+- In the current stub runtime, responses can complete quickly; `Abort` may be hard to exercise manually unless you trigger a long-running run.
 
 ## Recommended run order
 
