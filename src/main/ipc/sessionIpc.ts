@@ -1,4 +1,9 @@
-import { IPC_CHANNELS, type SessionSendPromptRequest } from "../../shared/ipc";
+import {
+  IPC_CHANNELS,
+  type SessionSendPromptRequest,
+  type SessionSteerRequest,
+  type SessionFollowUpRequest
+} from "../../shared/ipc";
 import type { OrchestratorService } from "../orchestrator/OrchestratorService";
 
 interface IpcMainLike {
@@ -30,6 +35,20 @@ export function registerSessionIpc(options: RegisterSessionIpcOptions): void {
 
   ipcMain.handle(IPC_CHANNELS.sessionAbort, async () => {
     await orchestrator.abort();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.sessionSteer, (_event, payload) => {
+    const request = payload as SessionSteerRequest;
+    orchestrator.steer(request.text);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.sessionFollowUp, (_event, payload) => {
+    const request = payload as SessionFollowUpRequest;
+    orchestrator.followUp(request.text);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.sessionClearQueue, () => {
+    return orchestrator.clearQueue();
   });
 
   orchestrator.onTimelineEvent((event) => {
