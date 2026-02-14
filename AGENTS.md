@@ -44,6 +44,7 @@ Required behavior:
 3. After delegated/parallel implementation reports completion, run the documented phase-end gates process before integration.
 4. Only merge to `main` and clean up worktree/branch after gate results are reviewed and accepted.
 5. After each sub-session review, automatically copy the follow-up feedback prompt to the clipboard via detached `wl-copy` (no extra user confirmation needed).
+6. Exception: if the follow-up is only "all good / stop and close sub-session", do not copy a prompt to clipboard; report approval and proceed to cleanup/integration.
 
 If instructions from memory conflict with `docs/workflow.md`, follow the document and call out the difference explicitly.
 

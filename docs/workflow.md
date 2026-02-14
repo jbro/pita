@@ -153,6 +153,8 @@ When the implementation session reports completion, prepare the next **feedback 
 
 Rule: after every review response (approve/fix/next batch), copy the exact follow-up prompt to clipboard by default.
 
+Exception: if the follow-up is only "approved, stop and close the sub-session", do not copy a prompt; report approval directly and proceed to cleanup/integration.
+
 When implementation is complete, prepare a **phase-end gates prompt** and copy it with `wl-copy` the same way.
 
 Suggested phase-end gates prompt:
