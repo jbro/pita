@@ -1,9 +1,9 @@
 import { CommandPalettePlaceholder } from "./components/CommandPalettePlaceholder";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PromptComposerPanel } from "./components/PromptComposerPanel";
-import { TimelinePanel } from "./components/TimelinePanel";
+import { TimelinePanel, type TimelineItem } from "./components/TimelinePanel";
 
-const timelineItems = [
+const timelineItems: TimelineItem[] = [
   { id: "1", role: "user", text: "How does the foreground slot work?" },
   { id: "2", role: "assistant", text: "One worker is attached to the rich UI at a time." },
   { id: "3", role: "tool", text: "git status --short" }

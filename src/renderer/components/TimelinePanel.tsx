@@ -1,4 +1,4 @@
-interface TimelineItem {
+export interface TimelineItem {
   id: string;
   role: "user" | "assistant" | "tool";
   text: string;
