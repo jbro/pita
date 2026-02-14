@@ -1,3 +1,11 @@
+/**
+ * Preload API type contract and test-only stub.
+ *
+ * The exported `preloadApi` object provides a no-op implementation used by
+ * tests and as a type reference. The real preload bridge is built in
+ * src/preload/preload.ts using contextBridge + ipcRenderer directly.
+ * This stub is never used at runtime in production Electron builds.
+ */
 import type {
   PromptOverlayCancelRequest,
   PromptOverlayEvent,
