@@ -5,11 +5,13 @@ import { App } from "../App";
 
 describe("App streaming timeline", () => {
   let timelineListener: ((event: SessionTimelineEvent) => void) | undefined;
+  let overlayListener: ((event: PromptOverlayEvent) => void) | undefined;
   const sendPrompt = vi.fn(async () => undefined);
   const abort = vi.fn(async () => undefined);
 
   beforeEach(() => {
     timelineListener = undefined;
+    overlayListener = undefined;
     sendPrompt.mockClear();
     abort.mockClear();
 
@@ -40,7 +42,10 @@ describe("App streaming timeline", () => {
           timelineListener = listener;
           return () => undefined;
         }),
-        onPromptOverlayEvent: vi.fn(() => () => undefined),
+        onPromptOverlayEvent: vi.fn((listener: (event: PromptOverlayEvent) => void) => {
+          overlayListener = listener;
+          return () => undefined;
+        }),
         submitPromptOverlay: vi.fn(async () => undefined),
         cancelPromptOverlay: vi.fn(async () => undefined)
       }
@@ -61,5 +66,27 @@ describe("App streaming timeline", () => {
 
     expect(screen.getByText("Hello world")).toBeTruthy();
     expect(screen.getByText("boom")).toBeTruthy();
+  });
+
+  it("switches composer into confirm overlay mode on prompt_overlay_request", () => {
+    render(<App />);
+
+    act(() => {
+      overlayListener?.({
+        type: "prompt_overlay_request",
+        requestId: "req-1",
+        kind: "confirm",
+        title: "Allow command?",
+        message: "Run git clean?",
+        confirmLabel: "Allow",
+        cancelLabel: "Deny"
+      });
+    });
+
+    expect(screen.getByText("Allow command?")).toBeTruthy();
+    expect(screen.getByText("Run git clean?")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Allow" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Deny" })).toBeTruthy();
+    expect(screen.queryByPlaceholderText("Ask Pi to continue…")).toBeNull();
   });
 });
