@@ -15,6 +15,9 @@ function createSession(events: LocalSdkEvent[]): LocalSdkSession {
       }
     },
     abort: vi.fn(async () => undefined),
+    steer: vi.fn(),
+    followUp: vi.fn(),
+    clearQueue: vi.fn(() => ({ steering: [], followUp: [] })),
     onEvent(next) {
       listener = next;
       return () => {
