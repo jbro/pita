@@ -17,6 +17,7 @@ Completed:
 - Vertical slice wiring for prompt send, abort, and streamed timeline updates.
 - Initial orchestrator and IPC contracts for single-session flow.
 - Fast local tests + Electron smoke test workflow.
+- Deterministic manual abort smoke path via staged `manual-abort` stub runtime mode.
 
 Remaining:
 - Local SDK embedding for primary agent (replace stub runtime path).
@@ -24,7 +25,6 @@ Remaining:
 - Command palette behavior beyond placeholder.
 - Foreground-slot/background-queue orchestration parity work.
 - Multi-session behavior beyond architecture-level design.
-- Make manual abort smoke deterministic (for example, slower or staged stub runtime, or explicit test mode).
 
 ## Phase 2 — Session and Workspace Expansion
 
