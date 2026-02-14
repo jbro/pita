@@ -36,10 +36,10 @@ if (!process.env.VITEST) {
     let mainWindow: BrowserWindow | null = null;
     const runtimeSelection = await createRuntimeAdapter();
 
+    console.info(runtimeSelection.startupMessage);
+
     if (runtimeSelection.fallbackReason) {
-      console.warn(
-        `[pita] Falling back to stub runtime after SDK bootstrap failure: ${runtimeSelection.fallbackReason}`
-      );
+      console.warn(`[pita] SDK bootstrap failed; using stub runtime fallback.`);
     }
 
     const orchestrator = new OrchestratorService(runtimeSelection.runtime);

@@ -24,6 +24,9 @@ describe("createRuntimeAdapter", () => {
 
     expect(result.kind).toBe("sdk");
     expect(result.runtime).toBe(sdkRuntime);
+    expect(result.startupMessage).toContain("selected=sdk");
+    expect(result.startupMessage).toContain("requested=sdk-default");
+    expect(result.startupMessage).toContain("fallback=no");
     expect(createStubRuntime).not.toHaveBeenCalled();
   });
 
@@ -44,6 +47,10 @@ describe("createRuntimeAdapter", () => {
 
     expect(result.kind).toBe("stub");
     expect(result.runtime).toBe(stubRuntime);
+    expect(result.startupMessage).toContain("selected=stub");
+    expect(result.startupMessage).toContain("requested=stub");
+    expect(result.startupMessage).toContain("stubMode=manual-abort");
+    expect(result.startupMessage).toContain("fallback=no");
     expect(createStubRuntime).toHaveBeenCalledWith("manual-abort");
     expect(createSdkRuntime).not.toHaveBeenCalled();
   });
@@ -62,5 +69,9 @@ describe("createRuntimeAdapter", () => {
     expect(result.kind).toBe("stub");
     expect(result.runtime).toBe(stubRuntime);
     expect(result.fallbackReason).toContain("sdk bootstrap failed");
+    expect(result.startupMessage).toContain("selected=stub");
+    expect(result.startupMessage).toContain("requested=sdk-default");
+    expect(result.startupMessage).toContain("fallback=yes");
+    expect(result.startupMessage).toContain("reason=sdk bootstrap failed");
   });
 });
