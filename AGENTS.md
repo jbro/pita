@@ -40,9 +40,10 @@ Before proposing execution mechanics (worktrees, session handoff, clipboard prom
 Required behavior:
 
 1. Treat `docs/workflow.md` as the operational source of truth for session handoff.
-2. Use the documented parallel-session handoff steps (including detached `wl-copy` usage) when applicable.
+2. Use the documented parallel-session handoff steps when applicable, preferring the one-line kickoff command flow (directory change + `pi` launch with initial prompt) copied via detached `wl-copy`.
 3. After delegated/parallel implementation reports completion, run the documented phase-end gates process before integration.
 4. Only merge to `main` and clean up worktree/branch after gate results are reviewed and accepted.
+5. After each sub-session review, automatically copy the follow-up feedback prompt to the clipboard via detached `wl-copy` (no extra user confirmation needed).
 
 If instructions from memory conflict with `docs/workflow.md`, follow the document and call out the difference explicitly.
 

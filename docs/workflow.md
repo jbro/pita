@@ -105,31 +105,13 @@ Use this workflow when implementation happens in a separate Pi session.
 cd /home/jbr/projects/pita
 git worktree add .worktrees/<worktree-name> -b <branch-name>
 
-# 2) Prepare kickoff prompt
-cat <<'EOF' >/tmp/pita-session-prompt.txt
-I'm using the executing-plans skill to implement this plan.
-
-Plan file:
-docs/plans/<plan-file>.md
-
-Constraint:
-- ONLY work inside this assigned worktree.
-- Do not modify files outside this worktree.
-
-Please:
-1) review the plan critically and raise any concerns first,
-2) execute the first batch (default first 3 tasks),
-3) report exact verification output,
-4) stop for feedback with: "Ready for feedback."
+# 2) Build one-line kickoff command and copy it to clipboard
+cat <<'EOF' | nohup wl-copy >/tmp/wl-copy-nohup.log 2>&1 &
+cd /home/jbr/projects/pita/.worktrees/<worktree-name> && $HOME/node_modules/.bin/pi $'I\'m using the executing-plans skill to implement this plan.\n\nPlan file:\ndocs/plans/<plan-file>.md\n\nConstraint:\n- ONLY work inside this assigned worktree.\n- Do not modify files outside this worktree.\n\nPlease:\n1) review the plan critically and raise any concerns first,\n2) execute the first batch (default first 3 tasks),\n3) report exact verification output,\n4) stop for feedback with: "Ready for feedback."'
 EOF
 
-# 3) Copy prompt to clipboard (detached)
-nohup sh -c 'cat /tmp/pita-session-prompt.txt | wl-copy' >/tmp/wl-copy-nohup.log 2>&1 &
-
-# 4) Verify clipboard and start session
-wl-paste | sed -n '1,20p'
-cd .worktrees/<worktree-name>
-$HOME/node_modules/.bin/pi
+# 3) Verify clipboard, then paste in your shell to launch Pi directly
+wl-paste | sed -n '1,4p'
 ```
 
 ### 1) Create isolated worktree from `main`
@@ -145,53 +127,33 @@ Example:
 git worktree add .worktrees/phase1-ui-shell -b phase1/ui-shell-static
 ```
 
-### 2) Prepare implementation kickoff prompt and copy to clipboard
+### 2) Prepare one-line kickoff command and copy to clipboard (preferred)
 
-Create prompt file:
+Copy a one-line command that both changes directory and starts Pi with the kickoff prompt:
 
 ```bash
-cat <<'EOF' >/tmp/pita-session-prompt.txt
-I'm using the executing-plans skill to implement this plan.
-
-Plan file:
-docs/plans/<plan-file>.md
-
-Constraint:
-- ONLY work inside this assigned worktree.
-- Do not modify files outside this worktree.
-
-Please:
-1) review the plan critically and raise any concerns first,
-2) execute the first batch (default first 3 tasks),
-3) report exact verification output,
-4) stop for feedback with: "Ready for feedback."
+cat <<'EOF' | nohup wl-copy >/tmp/wl-copy-nohup.log 2>&1 &
+cd /home/jbr/projects/pita/.worktrees/<worktree-name> && $HOME/node_modules/.bin/pi $'I\'m using the executing-plans skill to implement this plan.\n\nPlan file:\ndocs/plans/<plan-file>.md\n\nConstraint:\n- ONLY work inside this assigned worktree.\n- Do not modify files outside this worktree.\n\nPlease:\n1) review the plan critically and raise any concerns first,\n2) execute the first batch (default first 3 tasks),\n3) report exact verification output,\n4) stop for feedback with: "Ready for feedback."'
 EOF
-```
-
-Copy without blocking terminal (`wl-copy` stays alive to serve clipboard data):
-
-```bash
-nohup sh -c 'cat /tmp/pita-session-prompt.txt | wl-copy' >/tmp/wl-copy-nohup.log 2>&1 &
 ```
 
 Verify clipboard:
 
 ```bash
-wl-paste | sed -n '1,20p'
+wl-paste | sed -n '1,6p'
 ```
 
-### 3) Start separate Pi session in the worktree
+### 3) Start separate Pi session from the one-liner
 
-```bash
-cd .worktrees/<worktree-name>
-$HOME/node_modules/.bin/pi
-```
-
-Paste the kickoff prompt as the first message.
+Paste and run the copied one-liner in your shell.
 
 ### 4) Wait for implementation batch completion
 
-When the implementation session reports completion, prepare a **phase-end gates prompt** and copy it with `wl-copy` the same way.
+When the implementation session reports completion, prepare the next **feedback prompt** and copy it with detached `wl-copy` automatically.
+
+Rule: after every review response (approve/fix/next batch), copy the exact follow-up prompt to clipboard by default.
+
+When implementation is complete, prepare a **phase-end gates prompt** and copy it with `wl-copy` the same way.
 
 Suggested phase-end gates prompt:
 
