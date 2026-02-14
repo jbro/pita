@@ -1,0 +1,97 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #0f1115;
+  color: #e8eaf0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #0f1115;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  padding: 16px;
+}
+
+.app-header {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9ba4bc;
+}
+
+.app-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+}
+
+.panel {
+  background: #171a21;
+  border: 1px solid #2c3240;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.timeline-item {
+  display: grid;
+  gap: 4px;
+}
+
+.timeline-role {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8ea5ff;
+}
+
+.composer-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.composer-panel textarea {
+  width: 100%;
+  min-height: 88px;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid #2c3240;
+  background: #11141a;
+  color: #e8eaf0;
+  padding: 10px;
+}
+
+.composer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.composer-actions button {
+  border: 1px solid #3a4254;
+  background: #202532;
+  color: #d9def0;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
