@@ -5,10 +5,18 @@ import { TimelinePanel } from "./components/TimelinePanel";
 import { useSessionTimeline } from "./hooks/useSessionTimeline";
 
 export function App(): JSX.Element {
-  const { items, runState } = useSessionTimeline();
+  const { items, runState, steerCount, followUpCount } = useSessionTimeline();
 
   const handleSend = async (text: string): Promise<void> => {
     await window.pita.session.sendPrompt(text);
+  };
+
+  const handleSteer = async (text: string): Promise<void> => {
+    await window.pita.session.steer(text);
+  };
+
+  const handleFollowUp = async (text: string): Promise<void> => {
+    await window.pita.session.followUp(text);
   };
 
   const handleAbort = async (): Promise<void> => {
@@ -25,7 +33,15 @@ export function App(): JSX.Element {
           <CommandPalettePlaceholder />
         </main>
 
-        <PromptComposerPanel runState={runState} onSend={handleSend} onAbort={handleAbort} />
+        <PromptComposerPanel
+          runState={runState}
+          steerCount={steerCount}
+          followUpCount={followUpCount}
+          onSend={handleSend}
+          onSteer={handleSteer}
+          onFollowUp={handleFollowUp}
+          onAbort={handleAbort}
+        />
       </div>
     </ErrorBoundary>
   );
