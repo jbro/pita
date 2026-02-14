@@ -92,7 +92,7 @@ export function PromptComposerPanel({
       <div className="composer-actions">
         {pendingCount > 0 && (
           <span data-testid="pending-count" className="pending-count">
-            {pendingCount} queued
+            Steer: {steerCount} · Follow-up: {followUpCount}
           </span>
         )}
         <button type="button" onClick={handleSend} disabled={!hasText}>
