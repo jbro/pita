@@ -171,6 +171,10 @@ Required gates:
    - Confirm prompt send action is callable
    - Confirm timeline updates from runtime events
    - Confirm abort is visible and callable during a running stub response (`bun run dev` sets `PITA_STUB_RUNTIME_MODE=manual-abort`)
+   - Confirm button label changes from "Send" to "Steer" while running
+   - Confirm Enter while running triggers steer
+   - Confirm Alt+Enter while running queues follow-up
+   - Confirm pending queue count badge appears after steer/follow-up and resets when idle
 
 Also include:
 - bun run typecheck
