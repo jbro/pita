@@ -31,10 +31,10 @@ What it does:
 
 1. Builds Electron/main + renderer output.
 2. Launches Electron with Playwright.
-3. Verifies static shell regions are visible:
-   - `timeline-panel`
-   - `prompt-composer-panel`
-   - `command-palette-placeholder`
+3. Verifies vertical-slice behavior:
+   - `timeline-panel` and `prompt-composer-panel` are visible
+   - prompt input exists and send is callable
+   - timeline receives at least one runtime-driven update after send
 
 ## Manual smoke checklist
 
@@ -48,7 +48,9 @@ Confirm:
 
 - App launches in dev mode.
 - Electron window opens.
-- Timeline/composer/palette placeholder regions are visible.
+- Sending a prompt from the composer is possible.
+- Timeline updates while the runtime responds.
+- Abort control is visible while running.
 
 Notes:
 

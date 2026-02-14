@@ -29,6 +29,10 @@ Responsibilities:
 - Handle command palette and keyboard actions.
 - Display streaming updates and tool blocks.
 
+Phase 1B implementation note:
+- Renderer timeline state is event-driven through a session timeline hook.
+- Prompt composer send/abort controls are wired to preload session APIs.
+
 It does not directly own Pi runtime state.
 
 ### 2. Main Process (Electron)
@@ -46,6 +50,10 @@ Responsibilities:
 - Manage worker lifecycles.
 - Normalize events for UI consumption.
 - Buffer background events and replay summaries.
+
+Phase 1B implementation note:
+- A thin single-session `OrchestratorService` is now wired for `sendPrompt` and `abort`.
+- It emits normalized `state`, `response.start`, `response.chunk`, `response.end`, `response.abort`, and `error` events.
 
 ### 4. Agent Adapters
 

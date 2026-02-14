@@ -1,5 +1,10 @@
-import { app, BrowserWindow, type BrowserWindowConstructorOptions } from "electron";
+import { app, BrowserWindow, ipcMain, type BrowserWindowConstructorOptions } from "electron";
 import path from "node:path";
+import { registerSessionIpc } from "./ipc/sessionIpc";
+import {
+  OrchestratorService,
+  type RuntimeAdapter
+} from "./orchestrator/OrchestratorService";
 
 export function getMainWindowOptions(): BrowserWindowConstructorOptions {
   return {
@@ -28,13 +33,42 @@ function createMainWindow(): BrowserWindow {
   return window;
 }
 
+function createStubRuntimeAdapter(): RuntimeAdapter {
+  return {
+    async run(_text, callbacks): Promise<void> {
+      const messageId = `msg-${Date.now()}`;
+      callbacks.onStart(messageId);
+      callbacks.onChunk(messageId, "stub response");
+      callbacks.onEnd(messageId);
+    },
+    abort(): void {
+      return;
+    }
+  };
+}
+
 if (!process.env.VITEST) {
   app.whenReady().then(() => {
-    createMainWindow();
+    let mainWindow: BrowserWindow | null = null;
+    const orchestrator = new OrchestratorService(createStubRuntimeAdapter());
+
+    registerSessionIpc({
+      ipcMain,
+      orchestrator,
+      getTargetWindow: () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          return mainWindow;
+        }
+
+        return BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? null;
+      }
+    });
+
+    mainWindow = createMainWindow();
 
     app.on("activate", () => {
       if (BrowserWindow.getAllWindows().length === 0) {
-        createMainWindow();
+        mainWindow = createMainWindow();
       }
     });
   });

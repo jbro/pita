@@ -8,7 +8,8 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 
 - Desktop experience for Pi session control
 - Timeline-first interface for session activity
-- Prompt composer with streaming-aware controls
+- Prompt composer wired to single-session send/abort controls
+- Streamed timeline updates from main-process runtime events
 - Command palette and keyboard shortcut workflows
 - Multi-session architecture with foreground control semantics
 - Worktree-based agent execution model
@@ -20,6 +21,18 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 - **Pi session files are the source of truth**
 - **One active agent runtime per worktree**
 - **Git and worktrees are required**
+
+## Phase 1B Vertical Slice
+
+Implemented in this slice:
+- single-session IPC path for `session.sendPrompt` and `session.abort`
+- normalized timeline event forwarding (`session.timelineEvent`)
+- preload bridge methods for send/abort/event subscription
+- renderer hook-driven timeline updates and runtime-bound composer controls
+
+Out of scope for this slice:
+- steer/follow-up orchestration
+- multi-session UI controls
 
 ## Getting Started
 
