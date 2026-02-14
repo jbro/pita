@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { PromptOverlayRequestEvent } from "../../src/shared/ipc";
 import {
   LocalSdkRuntimeAdapter,
+  createLocalSdkSession,
   type LocalSdkEvent,
   type LocalSdkSession
 } from "../../src/main/runtime/localSdkRuntimeAdapter";
@@ -132,5 +133,85 @@ describe("LocalSdkRuntimeAdapter", () => {
 
     expect(resolvePromptOverlay).toHaveBeenNthCalledWith(1, "overlay-1", "confirm");
     expect(resolvePromptOverlay).toHaveBeenNthCalledWith(2, "overlay-1", "cancel");
+  });
+});
+
+describe("createLocalSdkSession", () => {
+  it("discovers prompt methods across supported direct and nested session shapes", async () => {
+    const callLog: string[] = [];
+
+    const cases = [
+      {
+        label: "direct prompt",
+        rawSession: {
+          prompt(text: string) {
+            callLog.push(`direct-prompt:${text}`);
+          }
+        }
+      },
+      {
+        label: "direct sendPrompt",
+        rawSession: {
+          sendPrompt(text: string) {
+            callLog.push(`direct-sendPrompt:${text}`);
+          }
+        }
+      },
+      {
+        label: "nested session.prompt",
+        rawSession: {
+          session: {
+            prompt(text: string) {
+              callLog.push(`nested-session-prompt:${text}`);
+            }
+          }
+        }
+      },
+      {
+        label: "nested session.sendPrompt",
+        rawSession: {
+          session: {
+            sendPrompt(text: string) {
+              callLog.push(`nested-session-sendPrompt:${text}`);
+            }
+          }
+        }
+      }
+    ];
+
+    for (const testCase of cases) {
+      const localSession = await createLocalSdkSession(
+        { PITA_LOCAL_SDK_MODULE: "fake-sdk" },
+        async () => ({
+          createAgentSession: async () => testCase.rawSession
+        })
+      );
+
+      await localSession.sendPrompt(testCase.label);
+    }
+
+    expect(callLog).toEqual([
+      "direct-prompt:direct prompt",
+      "direct-sendPrompt:direct sendPrompt",
+      "nested-session-prompt:nested session.prompt",
+      "nested-session-sendPrompt:nested session.sendPrompt"
+    ]);
+  });
+
+  it("reports attempted prompt method names when discovery fails", async () => {
+    const failure = await createLocalSdkSession(
+      { PITA_LOCAL_SDK_MODULE: "fake-sdk" },
+      async () => ({
+        createAgentSession: async () => ({ onEvent() {} })
+      })
+    ).catch((error: unknown) => error);
+
+    expect(failure).toBeInstanceOf(Error);
+
+    const message = (failure as Error).message;
+    expect(message).toContain("attemptedMethods=sendPrompt,prompt,runPrompt,run");
+    expect(message).toContain("directCandidates=none");
+    expect(message).toContain("nestedCandidates=none");
+    expect(message).toContain("topLevelKeys=onEvent");
   });
 });

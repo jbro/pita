@@ -20,7 +20,7 @@ describe("PromptComposerPanel", () => {
     render(<PromptComposerPanel steerCount={1} followUpCount={2} />);
 
     const badge = screen.getByTestId("pending-count");
-    expect(badge.textContent).toBe("3 queued");
+    expect(badge.textContent).toBe("Steer: 1 · Follow-up: 2");
   });
 
   it("hides pending count when both counts are zero", () => {

@@ -223,7 +223,7 @@ Steps:
 3. Inspect prompt composer status area.
 
 Expected:
-- Pending badge appears (example: `1 queued`, `2 queued`).
+- Pending badge appears with separate queue-type counts (example: `Steer: 1 · Follow-up: 0`).
 
 Observed (if FAIL/UNCLEAR):
 - 
@@ -236,7 +236,7 @@ Steps:
 2. Watch badge value.
 
 Expected:
-- Badge count increases accordingly.
+- Steer and follow-up counts update accordingly as more actions are queued.
 
 Observed (if FAIL/UNCLEAR):
 - 
@@ -321,11 +321,13 @@ Observed (if FAIL/UNCLEAR):
 
 Steps:
 1. Ensure app is idle.
-2. Trigger `Abort` (if enabled by UI path, command path, or test affordance).
+2. Confirm the `Abort` button is disabled in idle state.
+3. If you can still trigger abort via command/test path, trigger it once.
 
 Expected:
+- Disabled idle `Abort` button is expected.
 - No crash.
-- No broken UI state.
+- No invalid state transition (app remains idle).
 
 Observed (if FAIL/UNCLEAR):
 - Abort is not clickable when UI is idle
@@ -363,10 +365,13 @@ Observed (if FAIL/UNCLEAR):
 
 Steps:
 1. Run Tier 1 scenarios end to end.
-2. Watch for runtime errors or regressions.
+2. Watch terminal and console output during the run.
+3. Watch for prompt lifecycle regressions.
 
 Expected:
-- Existing behavior remains stable with overlay backend code present.
+- No console/runtime errors.
+- No preload/IPC exceptions.
+- No regressions in send/steer/follow-up/abort behavior.
 
 Observed (if FAIL/UNCLEAR):
 - 

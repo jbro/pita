@@ -58,10 +58,13 @@ Confirm:
 - Sending a prompt from the composer is possible.
 - Timeline updates while the runtime responds.
 - Abort control is visible while running.
+- Idle `Abort` button disabled state is expected; if abort is triggered via command/test path while idle, it is a safe no-op.
 - Button label changes from "Send" to "Steer" while running.
 - Pressing Enter while running triggers steer (not a new prompt).
 - Pressing Alt+Enter while running queues a follow-up.
-- Pending count badge appears after steer or follow-up and resets when idle.
+- Pending badge appears after steer or follow-up, shows separate steer and follow-up counts, and resets when idle.
+- No console/runtime errors or preload/IPC exceptions appear while running the prompt lifecycle.
+- No regressions in send/steer/follow-up/abort behavior with overlay backend code present.
 
 Notes:
 

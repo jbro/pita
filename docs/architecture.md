@@ -33,7 +33,7 @@ Implementation notes:
 - Timeline state is event-driven through a session timeline hook.
 - Prompt composer controls are wired to preload session APIs.
 - During streaming, Enter triggers `steer` and Alt+Enter triggers `followUp`. When idle, both submit a normal prompt.
-- A pending queue count badge appears when steered or follow-up messages are queued.
+- A pending queue badge appears when steer or follow-up messages are queued, with distinct counts per queue type.
 
 The renderer does not directly own Pi runtime state.
 

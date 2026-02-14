@@ -164,7 +164,16 @@ describe("Prompt composer runtime wiring", () => {
     mock.emit({ type: "queue.status", steerCount: 2, followUpCount: 1 });
 
     const badge = screen.getByTestId("pending-count");
-    expect(badge.textContent).toBe("3 queued");
+    expect(badge.textContent).toBe("Steer: 2 · Follow-up: 1");
+  });
+
+  it("shows separate steer and follow-up queue counts", () => {
+    render(<App />);
+
+    mock.emit({ type: "queue.status", steerCount: 1, followUpCount: 2 });
+
+    const badge = screen.getByTestId("pending-count");
+    expect(badge.textContent).toBe("Steer: 1 · Follow-up: 2");
   });
 
   it("hides pending count when queue resets to zero", () => {

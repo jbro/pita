@@ -29,7 +29,7 @@ Implemented now:
 - explicit stub override (`PITA_RUNTIME_KIND=stub`) with deterministic `manual-abort` mode for smoke checks,
 - automatic stub fallback when SDK bootstrap fails,
 - steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) behavior matching TUI parity,
-- queue status display (pending message count) in prompt composer,
+- queue status display in prompt composer with distinct steer vs follow-up counts,
 - confirm-only backend prompt overlay contract across adapter/orchestrator/IPC/preload (`request`, `submit/cancel`, `resolved`).
 
 Not implemented yet:
