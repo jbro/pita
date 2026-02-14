@@ -176,6 +176,10 @@ export class OrchestratorService {
   }
 
   private setState(state: SessionRunState): void {
+    if (this.state === state) {
+      return;
+    }
+
     this.state = state;
     this.emit({ type: "state", state });
   }

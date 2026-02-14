@@ -80,7 +80,10 @@ describe("OrchestratorService", () => {
     expect(runtime.abort).toHaveBeenCalledTimes(1);
     expect(events).toContain("state:aborting");
     expect(events).toContain("response.abort");
-    expect(events.at(-1)).toBe("state:idle");
+    expect(events).toContain("state:idle");
+    // After setState dedup, idle is emitted once (by abort), then finally's
+    // resetQueueCounts emits queue.status as the last event.
+    expect(events.filter((e) => e === "state:idle").length).toBe(1);
   });
 
   it("abort while idle is a safe no-op", async () => {
@@ -198,6 +201,40 @@ describe("OrchestratorService", () => {
       requestId: "overlay-1",
       status: "cancelled"
     });
+  });
+
+  it("abort during running emits exactly one idle state transition", async () => {
+    let resolveRun: (() => void) | undefined;
+
+    const runtime: RuntimeAdapter = {
+      run(_text: string, callbacks: RuntimeCallbacks): Promise<void> {
+        callbacks.onStart("msg-1");
+        return new Promise<void>((resolve) => {
+          resolveRun = resolve;
+        });
+      },
+      abort: vi.fn(() => {
+        resolveRun?.();
+      })
+    };
+
+    const service = new OrchestratorService(runtime);
+    const stateEvents: string[] = [];
+
+    service.onTimelineEvent((event) => {
+      if (event.type === "state") {
+        stateEvents.push(event.state);
+      }
+    });
+
+    const runPromise = service.sendPrompt("hi");
+    await Promise.resolve();
+
+    await service.abort();
+    await runPromise;
+
+    const idleCount = stateEvents.filter((s) => s === "idle").length;
+    expect(idleCount).toBe(1);
   });
 
   it("stale requestId submit and cancel are rejected", () => {
