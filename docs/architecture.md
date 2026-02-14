@@ -100,6 +100,8 @@ Pi session files remain source of truth for session history.
 
 ## Hard Invariant: One Active Agent per Worktree
 
+> **Status:** Designed but not yet implemented. The lock file, PID checks, and heartbeat logic described below are target behavior for Phase 2+. Current single-session operation avoids collisions by construction.
+
 A worktree may only have one active runtime at a time.
 
 ### Locking Strategy
