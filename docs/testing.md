@@ -56,8 +56,8 @@ Confirm:
 Notes:
 
 - `bun run dev` is long-running by design.
+- The dev script sets `PITA_STUB_RUNTIME_MODE=manual-abort`, which keeps each stub run active long enough to click `Abort` reliably.
 - If scripting this check, use a timeout and terminate cleanly after confirmation.
-- In the current stub runtime, responses can complete quickly; `Abort` may be hard to exercise manually unless you trigger a long-running run.
 
 ## Recommended run order
 
