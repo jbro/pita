@@ -189,7 +189,7 @@ Implemented subset today:
 
 | Event | Direction | Required Fields | Notes |
 |---|---|---|---|
-| `prompt_overlay_request` | Orchestrator -> Renderer | `requestId`, `kind`, `sessionId` | `kind`: `choice` \| `confirm` \| `freeform` |
+| `prompt_overlay_request` | Orchestrator -> Renderer | `requestId`, `kind` | Implemented now for `kind: confirm`; broader kinds remain planned |
 | `prompt_overlay_request.choice` | Orchestrator -> Renderer | `title`, `options[]`, `allowFreeform` | `options` include `id`, `label`, optional `shortcut` |
 | `prompt_overlay_request.confirm` | Orchestrator -> Renderer | `title`, `message`, `confirmLabel`, `cancelLabel` | Replaces prompt area until resolved |
 | `prompt_overlay_submit_choice` | Renderer -> Orchestrator | `requestId`, `selectedOptionId` | Sent on mouse, arrow+enter, or numeric selection |

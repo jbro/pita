@@ -10,6 +10,7 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 - Timeline-first interface for session activity
 - Prompt composer wired to single-session send/steer/follow-up/abort controls
 - Streamed timeline updates from main-process runtime events
+- Confirm-only prompt overlay backend contract (runtime -> orchestrator -> IPC -> preload)
 - Command palette and keyboard shortcut workflows
 - Multi-session architecture with foreground control semantics
 - Worktree-based agent execution model
