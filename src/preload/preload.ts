@@ -3,6 +3,9 @@ import { contextBridge, ipcRenderer } from "electron";
 const IPC_CHANNELS = {
   sessionSendPrompt: "session.sendPrompt",
   sessionAbort: "session.abort",
+  sessionSteer: "session.steer",
+  sessionFollowUp: "session.followUp",
+  sessionClearQueue: "session.clearQueue",
   sessionTimelineEvent: "session.timelineEvent"
 } as const;
 
@@ -12,7 +15,8 @@ type SessionTimelineEvent =
   | { type: "response.chunk"; messageId: string; chunk: string }
   | { type: "response.end"; messageId: string }
   | { type: "response.abort" }
-  | { type: "error"; message: string };
+  | { type: "error"; message: string }
+  | { type: "queue.status"; steerCount: number; followUpCount: number };
 
 contextBridge.exposeInMainWorld("pita", {
   version: "stub",
@@ -22,6 +26,15 @@ contextBridge.exposeInMainWorld("pita", {
     },
     abort(): Promise<void> {
       return ipcRenderer.invoke(IPC_CHANNELS.sessionAbort);
+    },
+    steer(text: string): Promise<void> {
+      return ipcRenderer.invoke(IPC_CHANNELS.sessionSteer, { text });
+    },
+    followUp(text: string): Promise<void> {
+      return ipcRenderer.invoke(IPC_CHANNELS.sessionFollowUp, { text });
+    },
+    clearQueue(): Promise<{ steering: string[]; followUp: string[] }> {
+      return ipcRenderer.invoke(IPC_CHANNELS.sessionClearQueue);
     },
     onTimelineEvent(listener: (event: SessionTimelineEvent) => void): () => void {
       const handler = (_event: unknown, payload: SessionTimelineEvent) => {

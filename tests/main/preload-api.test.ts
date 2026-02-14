@@ -7,6 +7,9 @@ describe("preloadApi", () => {
     expect(preloadApi.pita.session).toEqual({
       sendPrompt: expect.any(Function),
       abort: expect.any(Function),
+      steer: expect.any(Function),
+      followUp: expect.any(Function),
+      clearQueue: expect.any(Function),
       onTimelineEvent: expect.any(Function)
     });
   });
