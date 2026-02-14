@@ -1,5 +1,9 @@
 # Pita
 
+<p align="center">
+  <img src="assets/logo.svg" alt="Pita logo" width="220" />
+</p>
+
 A desktop control center for the Pi coding agent.
 
 Pita gives you a clean, keyboard-first interface for running and steering Pi sessions with a worktree-oriented workflow.
