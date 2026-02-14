@@ -120,15 +120,38 @@ export async function createLocalSdkSession(
     throw new Error("createAgentSession() did not return a session object.");
   }
 
-  const sendPrompt = findFunction(rawSession as Record<string, unknown>, [
-    "sendPrompt",
-    "prompt",
-    "runPrompt",
-    "run"
-  ]);
+  const promptDiscovery = discoverMethod(rawSession as Record<string, unknown>, {
+    methodNames: ["sendPrompt", "prompt", "runPrompt", "run"],
+    nestedContainers: ["session", "agentSession", "manager"]
+  });
+
+  const sendPrompt = promptDiscovery.method;
 
   if (!sendPrompt) {
-    throw new Error("Local SDK session object does not expose a prompt method.");
+    throw new Error(
+      [
+        "Local SDK session object does not expose a prompt method.",
+        `attemptedMethods=${promptDiscovery.attemptedMethodNames.join(",")}`,
+        `directCandidates=${
+          promptDiscovery.directCandidates.length > 0
+            ? promptDiscovery.directCandidates.join(",")
+            : "none"
+        }`,
+        `nestedCandidates=${
+          promptDiscovery.nestedCandidates.length > 0
+            ? promptDiscovery.nestedCandidates.join(",")
+            : "none"
+        }`,
+        `scannedNestedContainers=${
+          promptDiscovery.scannedNestedContainers.length > 0
+            ? promptDiscovery.scannedNestedContainers.join(",")
+            : "none"
+        }`,
+        `topLevelKeys=${
+          promptDiscovery.topLevelKeys.length > 0 ? promptDiscovery.topLevelKeys.join(",") : "none"
+        }`
+      ].join(" ")
+    );
   }
 
   const abort =
@@ -243,18 +266,85 @@ function createEventSubscription(rawSession: Record<string, unknown>): LocalSdkS
   return () => () => undefined;
 }
 
+interface MethodDiscoveryOptions {
+  methodNames: string[];
+  nestedContainers?: string[];
+}
+
+interface MethodDiscoveryResult {
+  method: ((...args: unknown[]) => unknown) | undefined;
+  attemptedMethodNames: string[];
+  directCandidates: string[];
+  nestedCandidates: string[];
+  scannedNestedContainers: string[];
+  topLevelKeys: string[];
+}
+
+function discoverMethod(
+  object: Record<string, unknown>,
+  options: MethodDiscoveryOptions
+): MethodDiscoveryResult {
+  const topLevelKeys = Object.keys(object);
+  const directCandidates: string[] = [];
+  const nestedCandidates: string[] = [];
+  const scannedNestedContainers: string[] = [];
+
+  for (const name of options.methodNames) {
+    const maybeFn = object[name];
+    if (typeof maybeFn === "function") {
+      directCandidates.push(name);
+      return {
+        method: maybeFn.bind(object),
+        attemptedMethodNames: options.methodNames,
+        directCandidates,
+        nestedCandidates,
+        scannedNestedContainers,
+        topLevelKeys
+      };
+    }
+  }
+
+  for (const containerName of options.nestedContainers ?? []) {
+    const nested = object[containerName];
+    if (!nested || typeof nested !== "object") {
+      continue;
+    }
+
+    scannedNestedContainers.push(containerName);
+    const nestedObject = nested as Record<string, unknown>;
+
+    for (const name of options.methodNames) {
+      const maybeFn = nestedObject[name];
+      if (typeof maybeFn === "function") {
+        const candidate = `${containerName}.${name}`;
+        nestedCandidates.push(candidate);
+        return {
+          method: maybeFn.bind(nestedObject),
+          attemptedMethodNames: options.methodNames,
+          directCandidates,
+          nestedCandidates,
+          scannedNestedContainers,
+          topLevelKeys
+        };
+      }
+    }
+  }
+
+  return {
+    method: undefined,
+    attemptedMethodNames: options.methodNames,
+    directCandidates,
+    nestedCandidates,
+    scannedNestedContainers,
+    topLevelKeys
+  };
+}
+
 function findFunction<T extends Record<string, unknown>>(
   object: T,
   names: string[]
 ): ((...args: unknown[]) => unknown) | undefined {
-  for (const name of names) {
-    const maybeFn = object[name];
-    if (typeof maybeFn === "function") {
-      return maybeFn.bind(object);
-    }
-  }
-
-  return undefined;
+  return discoverMethod(object, { methodNames: names }).method;
 }
 
 function isLocalSdkEvent(value: unknown): value is LocalSdkEvent {

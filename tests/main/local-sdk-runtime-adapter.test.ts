@@ -199,13 +199,19 @@ describe("createLocalSdkSession", () => {
   });
 
   it("reports attempted prompt method names when discovery fails", async () => {
-    await expect(
-      createLocalSdkSession(
-        { PITA_LOCAL_SDK_MODULE: "fake-sdk" },
-        async () => ({
-          createAgentSession: async () => ({ onEvent() {} })
-        })
-      )
-    ).rejects.toThrow(/sendPrompt|prompt|runPrompt|run/);
+    const failure = await createLocalSdkSession(
+      { PITA_LOCAL_SDK_MODULE: "fake-sdk" },
+      async () => ({
+        createAgentSession: async () => ({ onEvent() {} })
+      })
+    ).catch((error: unknown) => error);
+
+    expect(failure).toBeInstanceOf(Error);
+
+    const message = (failure as Error).message;
+    expect(message).toContain("attemptedMethods=sendPrompt,prompt,runPrompt,run");
+    expect(message).toContain("directCandidates=none");
+    expect(message).toContain("nestedCandidates=none");
+    expect(message).toContain("topLevelKeys=onEvent");
   });
 });
