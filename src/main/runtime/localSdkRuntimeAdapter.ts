@@ -1,4 +1,10 @@
-import type { RuntimeAdapter, RuntimeCallbacks } from "../orchestrator/OrchestratorService";
+import type { PromptOverlayRequestEvent } from "../../shared/ipc";
+import type {
+  PromptOverlayDecision,
+  PromptOverlayRequestListener,
+  RuntimeAdapter,
+  RuntimeCallbacks
+} from "../orchestrator/OrchestratorService";
 
 export type LocalSdkEvent =
   | { type: "response.start"; messageId: string }
@@ -13,6 +19,8 @@ export interface LocalSdkSession {
   followUp(text: string): Promise<void> | void;
   clearQueue(): { steering: string[]; followUp: string[] };
   onEvent(listener: (event: LocalSdkEvent) => void): () => void;
+  onPromptOverlayRequest?(listener: (request: PromptOverlayRequestEvent) => void): () => void;
+  resolvePromptOverlay?(requestId: string, decision: PromptOverlayDecision): Promise<void> | void;
 }
 
 export class LocalSdkRuntimeAdapter implements RuntimeAdapter {
@@ -80,6 +88,18 @@ export class LocalSdkRuntimeAdapter implements RuntimeAdapter {
   public clearQueue(): { steering: string[]; followUp: string[] } {
     return this.session.clearQueue();
   }
+
+  public onPromptOverlayRequest(listener: PromptOverlayRequestListener): () => void {
+    if (!this.session.onPromptOverlayRequest) {
+      return () => undefined;
+    }
+
+    return this.session.onPromptOverlayRequest((request) => {
+      listener(request, (decision) => {
+        void this.session.resolvePromptOverlay?.(request.requestId, decision);
+      });
+    });
+  }
 }
 
 export async function createLocalSdkSession(
@@ -126,6 +146,12 @@ export async function createLocalSdkSession(
     findFunction(rawSession as Record<string, unknown>, ["clearQueue"]) ??
     (() => ({ steering: [], followUp: [] }));
 
+  const onPromptOverlayRequest =
+    findFunction(rawSession as Record<string, unknown>, ["onPromptOverlayRequest"]) ?? undefined;
+
+  const resolvePromptOverlay =
+    findFunction(rawSession as Record<string, unknown>, ["resolvePromptOverlay"]) ?? undefined;
+
   return {
     async sendPrompt(text): Promise<void> {
       await Promise.resolve(sendPrompt(text));
@@ -146,7 +172,25 @@ export async function createLocalSdkSession(
       }
       return { steering: [], followUp: [] };
     },
-    onEvent
+    onEvent,
+    onPromptOverlayRequest: onPromptOverlayRequest
+      ? (listener): (() => void) => {
+          const maybeUnsubscribe = onPromptOverlayRequest(listener);
+
+          if (typeof maybeUnsubscribe === "function") {
+            return () => {
+              maybeUnsubscribe();
+            };
+          }
+
+          return () => undefined;
+        }
+      : undefined,
+    resolvePromptOverlay: resolvePromptOverlay
+      ? async (requestId: string, decision: PromptOverlayDecision): Promise<void> => {
+          await Promise.resolve(resolvePromptOverlay(requestId, decision));
+        }
+      : undefined
   };
 }
 
