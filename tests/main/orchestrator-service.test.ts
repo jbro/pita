@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import type { PromptOverlayEvent, PromptOverlayRequestEvent } from "../../src/shared/ipc";
 import {
   OrchestratorService,
   type RuntimeAdapter,
@@ -93,5 +94,126 @@ describe("OrchestratorService", () => {
     await service.abort();
 
     expect(runtime.abort).not.toHaveBeenCalled();
+  });
+
+  it("request registration emits prompt overlay request event", () => {
+    const runtime: RuntimeAdapter = {
+      run: vi.fn(),
+      abort: vi.fn()
+    };
+
+    const service = new OrchestratorService(runtime);
+    const overlayEvents: PromptOverlayEvent[] = [];
+
+    (service as any).onPromptOverlayEvent((event: PromptOverlayEvent) => {
+      overlayEvents.push(event);
+    });
+
+    const request: PromptOverlayRequestEvent = {
+      type: "prompt_overlay_request",
+      requestId: "overlay-1",
+      kind: "confirm",
+      title: "Confirm",
+      message: "Proceed?",
+      confirmLabel: "Yes",
+      cancelLabel: "No"
+    };
+
+    (service as any).requestPromptOverlay(request, vi.fn());
+
+    expect(overlayEvents).toEqual([request]);
+  });
+
+  it("submit resolves active request and emits resolved event", () => {
+    const resolveOverlay = vi.fn();
+
+    const runtime: RuntimeAdapter = {
+      run: vi.fn(),
+      abort: vi.fn()
+    };
+
+    const service = new OrchestratorService(runtime);
+    const overlayEvents: PromptOverlayEvent[] = [];
+
+    (service as any).onPromptOverlayEvent((event: PromptOverlayEvent) => {
+      overlayEvents.push(event);
+    });
+
+    (service as any).requestPromptOverlay(
+      {
+        type: "prompt_overlay_request",
+        requestId: "overlay-1",
+        kind: "confirm",
+        title: "Confirm",
+        message: "Proceed?",
+        confirmLabel: "Yes",
+        cancelLabel: "No"
+      },
+      resolveOverlay
+    );
+
+    (service as any).submitPromptOverlay("overlay-1", "confirm");
+
+    expect(resolveOverlay).toHaveBeenCalledWith("confirm");
+    expect(overlayEvents.at(-1)).toEqual({
+      type: "prompt_overlay_resolved",
+      requestId: "overlay-1",
+      status: "submitted"
+    });
+  });
+
+  it("cancel resolves active request with cancelled status", () => {
+    const resolveOverlay = vi.fn();
+
+    const runtime: RuntimeAdapter = {
+      run: vi.fn(),
+      abort: vi.fn()
+    };
+
+    const service = new OrchestratorService(runtime);
+    const overlayEvents: PromptOverlayEvent[] = [];
+
+    (service as any).onPromptOverlayEvent((event: PromptOverlayEvent) => {
+      overlayEvents.push(event);
+    });
+
+    (service as any).requestPromptOverlay(
+      {
+        type: "prompt_overlay_request",
+        requestId: "overlay-1",
+        kind: "confirm",
+        title: "Confirm",
+        message: "Proceed?",
+        confirmLabel: "Yes",
+        cancelLabel: "No"
+      },
+      resolveOverlay
+    );
+
+    (service as any).cancelPromptOverlay("overlay-1");
+
+    expect(resolveOverlay).toHaveBeenCalledWith("cancel");
+    expect(overlayEvents.at(-1)).toEqual({
+      type: "prompt_overlay_resolved",
+      requestId: "overlay-1",
+      status: "cancelled"
+    });
+  });
+
+  it("stale requestId submit and cancel are rejected", () => {
+    const runtime: RuntimeAdapter = {
+      run: vi.fn(),
+      abort: vi.fn()
+    };
+
+    const service = new OrchestratorService(runtime);
+
+    expect(() => {
+      (service as any).submitPromptOverlay("stale-id", "confirm");
+    }).toThrow("No active prompt overlay request for requestId stale-id");
+
+    expect(() => {
+      (service as any).cancelPromptOverlay("stale-id");
+    }).toThrow("No active prompt overlay request for requestId stale-id");
   });
 });
