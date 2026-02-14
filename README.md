@@ -38,3 +38,7 @@ Pita is built around the Pi ecosystem:
 - [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent)
 - [pi-tui](https://github.com/badlogic/pi-mono/tree/main/packages/tui)
 - [pi-web-ui](https://github.com/badlogic/pi-mono/tree/main/packages/web-ui)
+
+## License
+
+MIT. See [LICENSE](LICENSE).
