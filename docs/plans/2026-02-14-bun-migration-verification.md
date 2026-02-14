@@ -95,44 +95,66 @@ Result: PASS
 
 ## 4) Manual smoke checklist (`bun run dev`)
 
-Command used:
+Command used (no forced timeout):
 
 ```bash
-timeout 45s bun run dev
+bun run dev > /tmp/pita-dev.log 2>&1 &
+# wait for startup
+# inspect processes
+# stop with SIGINT
 ```
 
-Output:
+Observed process evidence:
+
+```text
+PID=54601
+54603 node /home/jbr/projects/pita/.worktrees/chore-bun-migration-exec/node_modules/.bin/concurrently -k vite wait-on tcp:5173 && bun run build:main && VITE_DEV_SERVER_URL=http://localhost:5173 electron .
+54610 node /home/jbr/projects/pita/.worktrees/chore-bun-migration-exec/node_modules/.bin/vite
+54611 node /home/jbr/projects/pita/.worktrees/chore-bun-migration-exec/node_modules/.bin/electron .
+54659 /home/jbr/projects/pita/.worktrees/chore-bun-migration-exec/node_modules/electron/dist/electron .
+...
+```
+
+Relevant `bun run dev` log excerpt:
 
 ```text
 $ concurrently -k "vite" "wait-on tcp:5173 && bun run build:main && VITE_DEV_SERVER_URL=http://localhost:5173 electron ."
-[0] 
-[0]   VITE v6.4.1  ready in 89 ms
-[0] 
+[0]
+[0]   VITE v6.4.1  ready in 82 ms
+[0]
 [0]   ➜  Local:   http://localhost:5173/
 [0]   ➜  Network: use --host to expose
 [1] $ tsc -p tsconfig.node.json
-[1] 
-[1] (electron:53611): IBUS-WARNING **: 19:10:13.951: electron has no capability of surrounding-text feature
-[1] [53647:0214/191013.962585:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 1 times!
-[1] [53647:0214/191016.512431:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 2 times!
-[1] [53647:0214/191019.030537:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 3 times!
-[1] /home/jbr/projects/pita/.worktrees/chore-bun-migration-exec/node_modules/electron/dist/electron exited with signal SIGTERM
-[0] vite exited with code 143
+[1]
+[1] (electron:54659): IBUS-WARNING **: 19:16:56.778: electron has no capability of surrounding-text feature
+[1] [54697:0214/191658.185102:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 1 times!
+[0] vite exited with code SIGINT
 --> Sending SIGTERM to other processes..
+[1] /home/jbr/projects/pita/.worktrees/chore-bun-migration-exec/node_modules/electron/dist/electron exited with signal SIGINT
 [1] wait-on tcp:5173 && bun run build:main && VITE_DEV_SERVER_URL=http://localhost:5173 electron . exited with code 1
-
-
-Command exited with code 124
 ```
 
-Checklist results from this run:
+Additional UI automation probe for abort callability during run:
 
-- Window opens: NOT CONFIRMED (process was intentionally terminated by timeout).
-- Prompt send is callable: NOT MANUALLY CONFIRMED in CLI-only run.
-- Timeline updates stream: NOT MANUALLY CONFIRMED in CLI-only run.
-- Abort visible/callable during run: NOT MANUALLY CONFIRMED in CLI-only run.
+```text
+window_open_check timeline-panel: true
+window_open_check prompt-composer-panel: true
+prompt_send_callable_type: function
+abort_visible_enabled_during_run: false
+timeline_items_after_send: 1
+locator.click: Timeout 30000ms exceeded.
+...
+- element is not enabled
+```
 
-Note: `bun run test:e2e` passed and already validates prompt send + timeline update behavior via Playwright.
+Checklist status:
+
+- Window opens: CONFIRMED (Electron process started; timeline/prompt panels visible in probe).
+- Prompt send is callable: CONFIRMED (`window.pita.session.sendPrompt` is `function`; prompt send creates timeline item).
+- Timeline updates stream: PARTIALLY CONFIRMED (`.timeline-item` appears after send; existing e2e passes).
+- Abort visible/callable during run: **NOT CONFIRMED** (button remained disabled in probe).
+
+Blocker: I cannot honestly mark abort as manually callable from this environment with current runtime behavior.
 
 ---
 
