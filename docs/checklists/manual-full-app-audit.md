@@ -222,7 +222,7 @@ Steps:
 3. Inspect prompt composer status area.
 
 Expected:
-- Pending badge appears (example: `1 queued`, `2 queued`).
+- Pending badge appears with separate queue-type counts (example: `Steer: 1 · Follow-up: 0`).
 
 Observed (if FAIL/UNCLEAR):
 - 
@@ -235,7 +235,7 @@ Steps:
 2. Watch badge value.
 
 Expected:
-- Badge count increases accordingly.
+- Steer and follow-up counts update accordingly as more actions are queued.
 
 Observed (if FAIL/UNCLEAR):
 - 
