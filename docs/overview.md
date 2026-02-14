@@ -25,13 +25,14 @@ Implemented now:
 - runnable Electron + React shell,
 - single-session send and abort controls,
 - streamed timeline updates via main-process IPC,
-- deterministic stub runtime behavior for local smoke tests,
-- explicit `manual-abort` stub mode for reliable abort checks in dev smoke runs.
+- SDK-first local runtime selection at startup,
+- explicit stub override (`PITA_RUNTIME_KIND=stub`) with deterministic `manual-abort` mode for smoke checks,
+- automatic stub fallback when SDK bootstrap fails.
 
 Not implemented yet:
 - steer and queue follow-up behavior,
 - multi-session UI controls,
-- local SDK runtime integration (beyond stubbed vertical-slice runtime).
+- deeper local SDK parity work beyond initial session wiring (for example extension prompt flows and richer event-role coverage).
 
 ## Documentation note
 

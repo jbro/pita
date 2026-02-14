@@ -44,8 +44,10 @@ Responsibilities:
 
 Phase 1B implementation note:
 - Session IPC handlers are registered during startup and forward orchestrator timeline events to the active window.
-- The current runtime path is intentionally stubbed for deterministic vertical-slice behavior.
+- Runtime selection is SDK-first at startup.
+- Operators can force stub runtime with `PITA_RUNTIME_KIND=stub`.
 - Stub runtime mode is selected via `PITA_STUB_RUNTIME_MODE` (`default` or `manual-abort`) to keep manual abort smoke deterministic without slowing all test paths.
+- If SDK bootstrap fails, the app falls back to stub runtime and logs an explicit startup selection line and fallback warning.
 
 ### 3. Orchestrator Service (Main Process Module)
 
