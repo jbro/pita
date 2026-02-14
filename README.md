@@ -11,6 +11,7 @@ Pita gives a solo developer a clean, keyboard-first interface to run and steer a
 - **Git and worktrees are required.**
 - **One active agent runtime per worktree.**
 - **Pi session files are the source of truth.**
+- **TUI compatibility comes first.**
 - **Start simple in UI, design for orchestration.**
 
 ## V1 Scope
@@ -34,7 +35,7 @@ Pita gives a solo developer a clean, keyboard-first interface to run and steer a
   - `LocalSdkAgentAdapter` (v1 primary)
   - `RpcWorkerAgentAdapter` (later / optional early worker mode)
 
-See `docs/architecture.md` for details.
+See `docs/architecture.md` for details, including the **TUI Compatibility Contract**.
 
 ## Non-Goals for V1
 
@@ -45,6 +46,7 @@ See `docs/architecture.md` for details.
 
 ## Documentation
 
+- `AGENTS.md` (agent-specific operating notes)
 - `docs/architecture.md`
 - `docs/ux.md`
 - `docs/workflow.md`

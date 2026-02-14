@@ -6,6 +6,20 @@ Pita is an Electron desktop app with a React renderer and a session orchestratio
 
 The system is built around one rich foreground experience and a future-ready multi-agent model.
 
+## Upstream Architecture Map
+
+Pi monorepo packages relevant to Pita:
+
+- `packages/ai`: provider and model APIs, streaming protocol, tool-call transport.
+- `packages/agent`: generic agent runtime and event model.
+- `packages/coding-agent`: Pi product runtime used by Pita (SDK, sessions, extensions, RPC, interactive mode).
+- `packages/tui`: terminal UI framework used by coding-agent interactive mode.
+- `packages/web-ui`: reusable browser chat components built around `pi-agent-core`.
+
+Practical guidance:
+- Treat `packages/coding-agent` behavior as the primary compatibility target.
+- Reuse `packages/web-ui` selectively for UI ideas, not as the runtime authority.
+
 ## Components
 
 ### 1. Renderer (React)
@@ -167,6 +181,35 @@ interface PromptOverlayRequestBase {
   createdAt: string; // ISO timestamp
 }
 ```
+
+## TUI Compatibility Contract (Primary)
+
+Pita treats the coding-agent TUI/runtime behavior as the compatibility baseline.
+
+### Compatibility Rules
+
+1. **Session compatibility first**
+   - Use `createAgentSession()` and `SessionManager` semantics.
+   - Keep Pi session files as source of truth.
+
+2. **Event compatibility first**
+   - Follow `AgentSessionEvent` ordering and meaning.
+   - Preserve streaming and tool event behavior in timeline updates.
+
+3. **Queue and steering parity**
+   - Match TUI behavior for `prompt`, `steer`, `followUp`, and `abort`.
+   - Keep message delivery semantics consistent while streaming.
+
+4. **Extension UI parity where possible**
+   - Support extension-driven `select`, `confirm`, `input`, and `editor` flows.
+   - Explicitly document any desktop-only gaps or degraded behaviors.
+
+5. **Message-role parity**
+   - Correctly represent coding-agent-specific message and session entries (for example bash execution, branch summaries, compaction summaries, and custom extension messages).
+
+### Design Implication
+
+`@mariozechner/pi-web-ui` can inform component design, but it does not define runtime behavior for Pita. Runtime and session behavior are governed by coding-agent SDK/TUI semantics.
 
 ## Future Extension Path
 

@@ -92,6 +92,8 @@ git worktree remove .worktrees/feature-agent-ui
 git branch -d feature/agent-ui
 ```
 
+For agent-specific session handoff guidance, see `AGENTS.md`.
+
 ## Error and Recovery Guidelines
 
 - On lock conflict: show current owner and refuse start.
