@@ -1,6 +1,13 @@
-import type { SessionClearQueueResponse, SessionTimelineEvent } from "./ipc";
+import type {
+  PromptOverlayCancelRequest,
+  PromptOverlayEvent,
+  PromptOverlaySubmitRequest,
+  SessionClearQueueResponse,
+  SessionTimelineEvent
+} from "./ipc";
 
 export type SessionTimelineListener = (event: SessionTimelineEvent) => void;
+export type PromptOverlayListener = (event: PromptOverlayEvent) => void;
 
 export interface PitaSessionApi {
   sendPrompt(text: string): Promise<void>;
@@ -9,6 +16,9 @@ export interface PitaSessionApi {
   followUp(text: string): Promise<void>;
   clearQueue(): Promise<SessionClearQueueResponse>;
   onTimelineEvent(listener: SessionTimelineListener): () => void;
+  onPromptOverlayEvent(listener: PromptOverlayListener): () => void;
+  submitPromptOverlay(request: PromptOverlaySubmitRequest): Promise<void>;
+  cancelPromptOverlay(request: PromptOverlayCancelRequest): Promise<void>;
 }
 
 export interface PitaPreloadApi {
@@ -41,6 +51,17 @@ export const preloadApi: PitaPreloadApi = {
         return () => {
           return;
         };
+      },
+      onPromptOverlayEvent(): () => void {
+        return () => {
+          return;
+        };
+      },
+      async submitPromptOverlay(): Promise<void> {
+        return;
+      },
+      async cancelPromptOverlay(): Promise<void> {
+        return;
       }
     }
   }

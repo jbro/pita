@@ -11,7 +11,10 @@ describe("preloadApi", () => {
       steer: expect.any(Function),
       followUp: expect.any(Function),
       clearQueue: expect.any(Function),
-      onTimelineEvent: expect.any(Function)
+      onTimelineEvent: expect.any(Function),
+      onPromptOverlayEvent: expect.any(Function),
+      submitPromptOverlay: expect.any(Function),
+      cancelPromptOverlay: expect.any(Function)
     });
   });
 
