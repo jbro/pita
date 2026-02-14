@@ -19,6 +19,8 @@ type TimelineListener = (event: SessionTimelineEvent) => void;
 
 export class OrchestratorService {
   private state: SessionRunState = "idle";
+  private steerCount = 0;
+  private followUpCount = 0;
   private readonly listeners = new Set<TimelineListener>();
 
   public constructor(private readonly runtime: RuntimeAdapter) {}
@@ -55,6 +57,7 @@ export class OrchestratorService {
         }
       });
     } finally {
+      this.resetQueueCounts();
       this.setState("idle");
     }
   }
@@ -68,6 +71,42 @@ export class OrchestratorService {
     this.runtime.abort();
     this.emit({ type: "response.abort" });
     this.setState("idle");
+  }
+
+  public steer(text: string): void {
+    if (!this.runtime.steer) {
+      return;
+    }
+
+    this.runtime.steer(text);
+    this.steerCount++;
+    this.emitQueueStatus();
+  }
+
+  public followUp(text: string): void {
+    if (!this.runtime.followUp) {
+      return;
+    }
+
+    this.runtime.followUp(text);
+    this.followUpCount++;
+    this.emitQueueStatus();
+  }
+
+  public clearQueue(): { steering: string[]; followUp: string[] } {
+    const result = this.runtime.clearQueue?.() ?? { steering: [], followUp: [] };
+    this.resetQueueCounts();
+    return result;
+  }
+
+  private resetQueueCounts(): void {
+    this.steerCount = 0;
+    this.followUpCount = 0;
+    this.emitQueueStatus();
+  }
+
+  private emitQueueStatus(): void {
+    this.emit({ type: "queue.status", steerCount: this.steerCount, followUpCount: this.followUpCount });
   }
 
   private setState(state: SessionRunState): void {

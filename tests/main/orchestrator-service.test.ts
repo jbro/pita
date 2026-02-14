@@ -35,6 +35,7 @@ describe("OrchestratorService", () => {
       "response.start",
       "response.chunk",
       "response.end",
+      "queue.status",
       "state:idle"
     ]);
   });
