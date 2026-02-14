@@ -28,6 +28,7 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 - [docs/ux.md](docs/ux.md) — UX and interaction model
 - [docs/workflow.md](docs/workflow.md) — git/worktree workflow conventions
 - [docs/roadmap.md](docs/roadmap.md) — delivery phases and milestones
+- [docs/testing.md](docs/testing.md) — local and phase-end verification flow
 - [AGENTS.md](AGENTS.md) — agent-oriented operating guidance
 
 ## Upstream

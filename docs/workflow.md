@@ -112,6 +112,10 @@ I'm using the executing-plans skill to implement this plan.
 Plan file:
 docs/plans/<plan-file>.md
 
+Constraint:
+- ONLY work inside this assigned worktree.
+- Do not modify files outside this worktree.
+
 Please:
 1) review the plan critically and raise any concerns first,
 2) execute the first batch (default first 3 tasks),
@@ -152,6 +156,10 @@ I'm using the executing-plans skill to implement this plan.
 Plan file:
 docs/plans/<plan-file>.md
 
+Constraint:
+- ONLY work inside this assigned worktree.
+- Do not modify files outside this worktree.
+
 Please:
 1) review the plan critically and raise any concerns first,
 2) execute the first batch (default first 3 tasks),
@@ -188,11 +196,21 @@ When the implementation session reports completion, prepare a **phase-end gates 
 Suggested phase-end gates prompt:
 
 ```text
-Run the phase-end quality gates now:
-1) Playwright Electron smoke test
-2) Manual smoke checklist
+Run phase-end gates now in this worktree and report exact output.
 
-Please report exact command output and checklist results.
+Required gates:
+1) Playwright Electron smoke test
+   - npm run test:e2e
+2) Manual smoke checklist
+   - Launch app (dev run)
+   - Confirm window opens
+   - Confirm timeline/composer/palette placeholder regions are visible
+
+Also include:
+- npm run typecheck
+- npm run test
+
+After running all gates, summarize pass/fail.
 If all gates pass, run /refine-docs and update any docs that should reflect the completed work.
 Then stop for review.
 ```
