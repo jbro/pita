@@ -2,52 +2,39 @@
 
 A desktop control center for the Pi coding agent.
 
-## Vision
+Pita gives you a clean, keyboard-first interface for running and steering Pi sessions with a worktree-oriented workflow.
 
-Pita gives a solo developer a clean, keyboard-first interface to run and steer agent sessions. It starts with one rich local agent experience and grows toward multi-agent orchestration across worktrees and remote runtimes.
+## Features
 
-## Core Principles
+- Desktop experience for Pi session control
+- Timeline-first interface for session activity
+- Prompt composer with streaming-aware controls
+- Command palette and keyboard shortcut workflows
+- Multi-session architecture with foreground control semantics
+- Worktree-based agent execution model
+- TUI-compatible runtime behavior
 
-- **Git and worktrees are required.**
-- **One active agent runtime per worktree.**
-- **Pi session files are the source of truth.**
-- **TUI compatibility comes first.**
-- **Start simple in UI, design for orchestration.**
+## Core Guarantees
 
-## V1 Scope
-
-- Electron app (Linux first), dark mode.
-- Timeline at the top, prompt composer at the bottom.
-- Timeline shows messages and collapsible tool blocks.
-- Prompt supports single-line and multiline modes.
-- Streaming-aware controls: prompt, steer, queue follow-up, abort.
-- Command palette (app commands only) and keyboard shortcuts.
-- Local primary agent via Pi SDK embedding.
-- Multi-session support in architecture (UI can expose it later).
-- Background event queue and pause/resume semantics in orchestration layer.
-
-## Architecture Snapshot
-
-- **Renderer (React):** timeline, prompt, command palette, shortcuts.
-- **Main process (Electron):** app lifecycle, IPC, command routing.
-- **Orchestrator service:** manages sessions, foreground slot, event queue.
-- **Agent adapters:**
-  - `LocalSdkAgentAdapter` (v1 primary)
-  - `RpcWorkerAgentAdapter` (later / optional early worker mode)
-
-See `docs/architecture.md` for details, including the **TUI Compatibility Contract**.
-
-## Non-Goals for V1
-
-- Mission-control overview UI.
-- Fully resizable side panels.
-- Full-featured remote-agent UI.
-- User-editable keymaps.
+- **TUI compatibility comes first**
+- **Pi session files are the source of truth**
+- **One active agent runtime per worktree**
+- **Git and worktrees are required**
 
 ## Documentation
 
-- `AGENTS.md` (agent-specific operating notes)
-- `docs/architecture.md`
-- `docs/ux.md`
-- `docs/workflow.md`
-- `docs/roadmap.md`
+- [docs/overview.md](docs/overview.md) — product scope and architecture snapshot
+- [docs/architecture.md](docs/architecture.md) — runtime model, contracts, compatibility rules
+- [docs/ux.md](docs/ux.md) — UX and interaction model
+- [docs/workflow.md](docs/workflow.md) — git/worktree workflow conventions
+- [docs/roadmap.md](docs/roadmap.md) — delivery phases and milestones
+- [AGENTS.md](AGENTS.md) — agent-oriented operating guidance
+
+## Upstream
+
+Pita is built around the Pi ecosystem:
+
+- [pi-mono](https://github.com/badlogic/pi-mono/tree/main)
+- [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent)
+- [pi-tui](https://github.com/badlogic/pi-mono/tree/main/packages/tui)
+- [pi-web-ui](https://github.com/badlogic/pi-mono/tree/main/packages/web-ui)
