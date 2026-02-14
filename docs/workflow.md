@@ -206,7 +206,7 @@ Required gates:
    - Confirm window opens
    - Confirm prompt send action is callable
    - Confirm timeline updates from runtime events
-   - Confirm abort is visible/callable during run
+   - Confirm abort is visible; confirm callability when a long-running run is available
 
 Also include:
 - bun run typecheck
