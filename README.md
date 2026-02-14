@@ -15,26 +15,6 @@ Pita gives you a clean, keyboard-first interface for running and steering Pi ses
 - Worktree-based agent execution model
 - TUI-compatible runtime behavior
 
-## Core Guarantees
-
-- **TUI compatibility comes first**
-- **Pi session files are the source of truth**
-- **One active agent runtime per worktree**
-- **Git and worktrees are required**
-
-## Phase 1B Vertical Slice
-
-Implemented in this slice:
-- single-session IPC path for `session.sendPrompt` and `session.abort`
-- normalized timeline event forwarding (`session.timelineEvent`)
-- preload bridge methods for send/abort/event subscription
-- renderer hook-driven timeline updates and runtime-bound composer controls
-- deterministic stub runtime behavior for smoke-testable send/stream/abort flow
-
-Out of scope for this slice:
-- steer/follow-up orchestration
-- multi-session UI controls
-
 ## Getting Started
 
 ```bash

@@ -27,7 +27,7 @@ Local clone for fast inspection:
 
 When starting a new planning or implementation session:
 
-1. Read `README.md` and `docs/architecture.md` first.
+1. Read `README.md`, `docs/overview.md`, `docs/architecture.md`, and `docs/workflow.md` first.
 2. Confirm the TUI Compatibility Contract still governs behavior.
 3. Validate assumptions against upstream code in `~/tmp/pi-mono/packages/coding-agent`.
 4. For UI questions, compare with `packages/tui` first, then `packages/web-ui` for optional patterns.
@@ -46,11 +46,17 @@ Required behavior:
 
 If instructions from memory conflict with `docs/workflow.md`, follow the document and call out the difference explicitly.
 
+## Documentation Placement Preferences
+
+- Keep `README.md` concise (quick intro, setup, and doc links).
+- Keep core guarantees and phase/status detail in `docs/overview.md` (and deeper docs), not in `README.md`.
+- When updating documentation, preserve this split unless the user asks otherwise.
+
 ## Session Reestablishment Protocol (Always Do First)
 
 At the start of every new or resumed session, before proposing implementation work:
 
-1. Re-read `README.md` and `docs/architecture.md`.
+1. Re-read `README.md`, `docs/overview.md`, `docs/architecture.md`, and `docs/workflow.md`.
 2. Inspect recent project activity (e.g., changed files, recent commits, open plan docs) to infer what is in progress.
 3. Summarize the inferred current objective, what is done, and what is still open.
 4. Recommend the best next actions (ordered, concrete, and minimal).

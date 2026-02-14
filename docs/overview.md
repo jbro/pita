@@ -12,6 +12,13 @@
 - Multi-session support in architecture (UI can expose it later).
 - Background event queue and pause/resume semantics in orchestration layer.
 
+## Core Guarantees
+
+- **TUI compatibility comes first**
+- **Pi session files are the source of truth**
+- **One active agent runtime per worktree**
+- **Git and worktrees are required**
+
 ## Current Implementation Status
 
 Implemented now:
