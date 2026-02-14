@@ -5,20 +5,28 @@ import { App } from "../App";
 
 describe("App streaming timeline", () => {
   let timelineListener: ((event: SessionTimelineEvent) => void) | undefined;
+  const sendPrompt = vi.fn(async () => undefined);
+  const abort = vi.fn(async () => undefined);
 
   beforeEach(() => {
     timelineListener = undefined;
+    sendPrompt.mockClear();
+    abort.mockClear();
 
     (window as typeof window & {
       pita: {
         version: string;
         session: {
+          sendPrompt(text: string): Promise<void>;
+          abort(): Promise<void>;
           onTimelineEvent(listener: (event: SessionTimelineEvent) => void): () => void;
         };
       };
     }).pita = {
       version: "test",
       session: {
+        sendPrompt,
+        abort,
         onTimelineEvent: vi.fn((listener: (event: SessionTimelineEvent) => void) => {
           timelineListener = listener;
           return () => undefined;
