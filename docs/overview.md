@@ -30,7 +30,10 @@ Implemented now:
 - automatic stub fallback when SDK bootstrap fails,
 - steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) behavior matching TUI parity,
 - queue status display in prompt composer with distinct steer vs follow-up counts,
-- confirm-only prompt overlay flow across adapter/orchestrator/IPC/preload/renderer composer (`request`, `submit/cancel`, `resolved`).
+- confirm-only prompt overlay flow across adapter/orchestrator/IPC/preload/renderer composer (`request`, `submit/cancel`, `resolved`),
+- command palette (`Cmd/Ctrl+K`) with fuzzy search, keyboard navigation, and execution,
+- initial command palette commands: Clear Timeline and Focus Prompt,
+- command palette shortcut hint in the header (`⌘K / Ctrl+K`).
 
 Not implemented yet:
 - multi-session UI controls,
