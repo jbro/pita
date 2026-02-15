@@ -4,30 +4,18 @@ import type { PromptOverlayRequestEvent } from "../../shared/ipc";
 import { PromptComposerPanel } from "../components/PromptComposerPanel";
 
 describe("PromptComposerPanel", () => {
-  it("renders send and abort controls", () => {
+  it("renders textarea and no action buttons in normal mode", () => {
     render(<PromptComposerPanel />);
 
-    expect(screen.getByRole("button", { name: /send/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /abort/i })).toBeTruthy();
+    expect(screen.getByPlaceholderText("Ask Pi to continue…")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /send/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /abort/i })).toBeNull();
   });
 
-  it("shows Steer label when running", () => {
+  it("shows busy spinner when running", () => {
     render(<PromptComposerPanel runState="running" />);
 
-    expect(screen.getByRole("button", { name: /steer/i })).toBeTruthy();
-  });
-
-  it("shows pending count when steerCount + followUpCount > 0", () => {
-    render(<PromptComposerPanel steerCount={1} followUpCount={2} />);
-
-    const badge = screen.getByTestId("pending-count");
-    expect(badge.textContent).toBe("Steer: 1 · Follow-up: 2");
-  });
-
-  it("hides pending count when both counts are zero", () => {
-    render(<PromptComposerPanel steerCount={0} followUpCount={0} />);
-
-    expect(screen.queryByTestId("pending-count")).toBeNull();
+    expect(screen.getByLabelText("Agent is busy")).toBeTruthy();
   });
 
   it("renders confirm overlay mode when active confirm request exists", () => {

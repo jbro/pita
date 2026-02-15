@@ -1,4 +1,4 @@
-import { useEffect, type KeyboardEvent, useState } from "react";
+import { useEffect, useRef, type KeyboardEvent, useState } from "react";
 import type { PromptOverlayRequestEvent, SessionRunState } from "../../shared/ipc";
 
 interface PromptComposerPanelProps {
@@ -28,36 +28,46 @@ export function PromptComposerPanel({
 }: PromptComposerPanelProps): JSX.Element {
   const [text, setText] = useState("");
   const [overlayError, setOverlayError] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     setOverlayError(null);
   }, [activeConfirmOverlay?.requestId]);
 
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "0px";
+    const nextHeight = Math.min(textarea.scrollHeight, 220);
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY = textarea.scrollHeight > 220 ? "auto" : "hidden";
+  }, [text]);
+
   const isRunning = runState === "running";
   const trimmed = text.trim();
   const hasText = trimmed.length > 0;
-  const pendingCount = steerCount + followUpCount;
 
   const submitText = async (mode: "send" | "steer" | "followUp"): Promise<void> => {
     if (!hasText) return;
 
     const value = trimmed;
+    let action: (() => Promise<void>) | null = null;
 
-    if (mode === "steer" && onSteer) {
-      await onSteer(value);
+    if (mode === "send" && onSend) {
+      action = () => onSend(value);
+    } else if (mode === "steer" && onSteer) {
+      action = () => onSteer(value);
     } else if (mode === "followUp" && onFollowUp) {
-      await onFollowUp(value);
-    } else if (onSend) {
-      await onSend(value);
+      action = () => onFollowUp(value);
     }
-  };
 
-  const handleSend = async (): Promise<void> => {
-    if (isRunning) {
-      await submitText("steer");
-    } else {
-      await submitText("send");
-    }
+    if (!action) return;
+
+    setText("");
+    textareaRef.current?.focus();
+
+    await action();
   };
 
   const handleAbort = async (): Promise<void> => {
@@ -66,22 +76,45 @@ export function PromptComposerPanel({
   };
 
   const handleKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement>): Promise<void> => {
-    if (event.key !== "Enter" || !hasText) return;
-
-    if (event.altKey) {
+    if (event.key === "Escape") {
       event.preventDefault();
+
+      if (isRunning) {
+        await handleAbort();
+      } else {
+        setText("");
+        textareaRef.current?.focus();
+      }
+
+      return;
+    }
+
+    if (event.key !== "Enter") return;
+
+    const isAltShortcut = event.altKey || event.getModifierState("AltGraph");
+    const isCtrlShortcut = event.ctrlKey || event.metaKey;
+
+    if (!isAltShortcut && !isCtrlShortcut) {
+      return;
+    }
+
+    if (!hasText) return;
+
+    event.preventDefault();
+
+    if (isAltShortcut) {
       if (isRunning) {
         await submitText("followUp");
       } else {
         await submitText("send");
       }
-    } else if (!event.shiftKey) {
-      event.preventDefault();
-      if (isRunning) {
-        await submitText("steer");
-      } else {
-        await submitText("send");
-      }
+      return;
+    }
+
+    if (isRunning) {
+      await submitText("steer");
+    } else {
+      await submitText("send");
     }
   };
 
@@ -137,28 +170,26 @@ export function PromptComposerPanel({
       data-testid="prompt-composer-panel"
       aria-label="Prompt composer panel"
     >
-      <h2>Prompt Composer</h2>
-      <textarea
-        placeholder="Ask Pi to continue…"
-        value={text}
-        onChange={(event) => {
-          setText(event.target.value);
-        }}
-        onKeyDown={handleKeyDown}
-      />
-      <div className="composer-actions">
-        {pendingCount > 0 && (
-          <span data-testid="pending-count" className="pending-count">
-            Steer: {steerCount} · Follow-up: {followUpCount}
-          </span>
+      <div className="composer-input-row">
+        <textarea
+          ref={textareaRef}
+          rows={1}
+          placeholder="Ask Pi to continue…"
+          value={text}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          onKeyDown={handleKeyDown}
+        />
+        {isRunning && (
+          <div className="composer-busy-indicator" aria-label="Agent is busy" title="Agent is busy" />
         )}
-        <button type="button" onClick={handleSend} disabled={!hasText}>
-          {isRunning ? "Steer" : "Send"}
-        </button>
-        <button type="button" onClick={handleAbort} disabled={!isRunning}>
-          Abort
-        </button>
       </div>
+      <p className="composer-shortcuts">
+        {isRunning
+          ? "Ctrl+Enter: steer · Alt+Enter: queue follow-up · Esc: cancel"
+          : "Ctrl+Enter: send · Esc: clear prompt"}
+      </p>
     </section>
   );
 }

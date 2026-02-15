@@ -90,22 +90,20 @@ describe("App streaming timeline", () => {
     expect(screen.queryByPlaceholderText("Ask Pi to continue…")).toBeNull();
   });
 
-  it("appends a user message to the timeline when sendPrompt is called", async () => {
+  it("appends a user message to the timeline when Ctrl+Enter sends", async () => {
     render(<App />);
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…");
     fireEvent.change(input, { target: { value: "hello world" } });
 
-    const sendButton = screen.getByRole("button", { name: "Send" });
     await act(async () => {
-      sendButton.click();
+      fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
     });
 
     const userItems = screen.getAllByText("user");
     expect(userItems.length).toBeGreaterThanOrEqual(1);
     const helloMatches = screen.getAllByText("hello world");
     expect(helloMatches.length).toBeGreaterThanOrEqual(1);
-    // Verify at least one match is in the timeline (a span), not just the textarea
     const timelineMatch = helloMatches.find((el) => el.tagName === "SPAN");
     expect(timelineMatch).toBeTruthy();
   });

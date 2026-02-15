@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { type PromptOverlayEvent, type PromptOverlayRequestEvent } from "../shared/ipc";
-import { CommandPalettePlaceholder } from "./components/CommandPalettePlaceholder";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PromptComposerPanel } from "./components/PromptComposerPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
 import { useSessionTimeline } from "./hooks/useSessionTimeline";
 
 export function App(): JSX.Element {
-  const { items, runState, steerCount, followUpCount, addUserMessage } = useSessionTimeline();
+  const { items, runState, steerCount, followUpCount, addUserMessage, addSteerMessage, addQueueMessage } =
+    useSessionTimeline();
   const [activeConfirmOverlay, setActiveConfirmOverlay] =
     useState<PromptOverlayRequestEvent | null>(null);
 
@@ -43,10 +43,12 @@ export function App(): JSX.Element {
   };
 
   const handleSteer = async (text: string): Promise<void> => {
+    addSteerMessage(text);
     await window.pita.session.steer(text);
   };
 
   const handleFollowUp = async (text: string): Promise<void> => {
+    addQueueMessage(text);
     await window.pita.session.followUp(text);
   };
 
@@ -69,7 +71,6 @@ export function App(): JSX.Element {
 
         <main className="app-main">
           <TimelinePanel items={items} />
-          <CommandPalettePlaceholder />
         </main>
 
         <PromptComposerPanel

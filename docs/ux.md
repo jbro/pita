@@ -24,19 +24,18 @@ Behavior:
 ### Prompt Composer (Bottom)
 
 Modes:
-- single-line input (not yet distinct from multiline — textarea is always used)
-- multiline input
+- normal prompt input mode
 - confirm overlay replacement mode (when a confirm prompt overlay request is active)
 
-Actions:
-- send prompt (idle): Enter or click Send
-- steer (streaming): Enter or click Steer — interrupts after the current tool call
-- queue follow-up (streaming): Alt+Enter — delivered after the agent finishes
-- abort current run: click Abort
+Keyboard actions:
+- idle: Ctrl+Enter sends, Esc clears the prompt
+- running: Ctrl+Enter steers, Alt+Enter queues follow-up, Esc aborts
+- Enter inserts a newline in both states
 
-The button label changes from "Send" to "Steer" while the agent is streaming.
-
-A pending count badge appears when steered or follow-up messages are queued (e.g. "3 queued"). It resets when the run completes.
+UI behavior:
+- no action buttons in normal mode; keyboard shortcuts are primary
+- a subtle busy spinner appears while the agent is running
+- helper text under the input shows the active shortcut set
 
 ## Command Palette and Shortcuts
 
