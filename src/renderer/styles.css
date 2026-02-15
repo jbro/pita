@@ -31,10 +31,26 @@ body {
 }
 
 .app-header {
+  display: flex;
+  justify-content: flex-end;
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #9ba4bc;
+}
+
+.app-header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.app-header-shortcut-hint {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #7f889e;
 }
 
 .app-main {

@@ -101,7 +101,12 @@ export function App(): JSX.Element {
   return (
     <ErrorBoundary>
       <div className="app-shell">
-        <header className="app-header">Pita · Phase 1 UI Shell</header>
+        <header className="app-header">
+          <div className="app-header-meta">
+            <div>Pita · Phase 1 UI Shell</div>
+            <div className="app-header-shortcut-hint">⌘K / Ctrl+K</div>
+          </div>
+        </header>
 
         <main className="app-main">
           <TimelinePanel items={items} />
