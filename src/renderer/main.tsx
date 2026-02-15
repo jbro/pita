@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from "jotai";
 import { App } from "./App";
+import { store } from "./store";
 import styles from "./styles.css?raw";
 
 function mountStyles(css: string): HTMLStyleElement {
@@ -47,6 +49,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </StrictMode>
 );

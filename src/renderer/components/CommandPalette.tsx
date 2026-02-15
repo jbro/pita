@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import Fuse from "fuse.js";
 import type { Command } from "../commands/registry";
+import { useAtom } from "../store";
+import { paletteSearchQueryAtom, paletteSelectedIndexAtom } from "../store/atoms";
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -13,8 +15,8 @@ export function CommandPalette({
   commands,
   onClose,
 }: CommandPaletteProps): JSX.Element | null {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useAtom(paletteSearchQueryAtom);
+  const [selectedIndex, setSelectedIndex] = useAtom(paletteSelectedIndexAtom);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fuse = new Fuse(commands, {
@@ -76,7 +78,15 @@ export function CommandPalette({
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [searchQuery]);
+  }, [searchQuery, setSelectedIndex]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      // Reset search and selection when palette closes
+      setSearchQuery('');
+      setSelectedIndex(0);
+    }
+  }, [isOpen, setSearchQuery, setSelectedIndex]);
 
   if (!isOpen) {
     return null;

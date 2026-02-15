@@ -2,11 +2,12 @@ import {
   useEffect,
   useRef,
   type KeyboardEvent,
-  useState,
   forwardRef,
   useImperativeHandle
 } from "react";
 import type { PromptOverlayRequestEvent, SessionRunState } from "../../shared/ipc";
+import { useAtom } from "../store";
+import { promptTextAtom, promptOverlayErrorAtom } from "../store/atoms";
 
 interface PromptComposerPanelProps {
   runState?: SessionRunState;
@@ -41,8 +42,8 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
     },
     ref
   ): JSX.Element {
-    const [text, setText] = useState("");
-    const [overlayError, setOverlayError] = useState<string | null>(null);
+    const [text, setText] = useAtom(promptTextAtom);
+    const [overlayError, setOverlayError] = useAtom(promptOverlayErrorAtom);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     useImperativeHandle(ref, () => ({

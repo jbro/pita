@@ -1,9 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import { Provider } from "jotai";
 import { App } from "../App";
+import { store } from "../store";
+import {
+  timelineItemsAtom,
+  runStateAtom,
+  steerCountAtom,
+  followUpCountAtom,
+  activeConfirmOverlayAtom,
+  paletteOpenAtom,
+  promptTextAtom,
+  promptOverlayErrorAtom,
+  paletteSearchQueryAtom,
+  paletteSelectedIndexAtom,
+} from "../store/atoms";
 
 describe("Command Palette Integration", () => {
   beforeEach(() => {
+    // Reset store state between tests
+    store.set(timelineItemsAtom, []);
+    store.set(runStateAtom, 'idle');
+    store.set(steerCountAtom, 0);
+    store.set(followUpCountAtom, 0);
+    store.set(activeConfirmOverlayAtom, null);
+    store.set(paletteOpenAtom, false);
+    store.set(promptTextAtom, '');
+    store.set(promptOverlayErrorAtom, null);
+    store.set(paletteSearchQueryAtom, '');
+    store.set(paletteSelectedIndexAtom, 0);
+
     (window as typeof window & {
       pita: {
         version: string;
@@ -36,7 +62,11 @@ describe("Command Palette Integration", () => {
   });
 
   it("opens command palette with Cmd+K", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     expect(screen.queryByPlaceholderText(/search commands/i)).toBeNull();
 
@@ -46,7 +76,11 @@ describe("Command Palette Integration", () => {
   });
 
   it("opens command palette with Ctrl+K", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     fireEvent.keyDown(window, { key: "k", ctrlKey: true });
 
@@ -54,7 +88,11 @@ describe("Command Palette Integration", () => {
   });
 
   it("clears timeline when Clear Timeline command is executed", async () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const textarea = screen.getByRole("textbox");
 
@@ -77,7 +115,11 @@ describe("Command Palette Integration", () => {
   });
 
   it("focuses prompt when Focus Prompt command is executed", async () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const textarea = screen.getByRole("textbox");
     textarea.blur();
