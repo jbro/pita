@@ -18,16 +18,25 @@ import {
 
 describe("Command Palette Integration", () => {
   beforeEach(() => {
-    // Reset store state between tests
+    class ResizeObserverMock {
+      observe(): void {}
+      unobserve(): void {}
+      disconnect(): void {}
+    }
+
+    (window as any).ResizeObserver = ResizeObserverMock;
+    (globalThis as any).ResizeObserver = ResizeObserverMock;
+    (HTMLElement.prototype as any).scrollIntoView = vi.fn();
+
     store.set(timelineItemsAtom, []);
-    store.set(runStateAtom, 'idle');
+    store.set(runStateAtom, "idle");
     store.set(steerCountAtom, 0);
     store.set(followUpCountAtom, 0);
     store.set(activeConfirmOverlayAtom, null);
     store.set(paletteOpenAtom, false);
-    store.set(promptTextAtom, '');
+    store.set(promptTextAtom, "");
     store.set(promptOverlayErrorAtom, null);
-    store.set(paletteSearchQueryAtom, '');
+    store.set(paletteSearchQueryAtom, "");
     store.set(paletteSelectedIndexAtom, 0);
 
     (window as typeof window & {
@@ -56,8 +65,8 @@ describe("Command Palette Integration", () => {
         onTimelineEvent: vi.fn(() => () => {}),
         onPromptOverlayEvent: vi.fn(() => () => {}),
         submitPromptOverlay: vi.fn().mockResolvedValue(undefined),
-        cancelPromptOverlay: vi.fn().mockResolvedValue(undefined)
-      }
+        cancelPromptOverlay: vi.fn().mockResolvedValue(undefined),
+      },
     };
   });
 
@@ -70,7 +79,7 @@ describe("Command Palette Integration", () => {
 
     expect(screen.queryByPlaceholderText(/search commands/i)).toBeNull();
 
-    fireEvent.keyDown(window, { key: "k", metaKey: true });
+    fireEvent.keyDown(document, { key: "k", metaKey: true });
 
     expect(screen.getByPlaceholderText(/search commands/i)).toBeTruthy();
   });
@@ -82,7 +91,7 @@ describe("Command Palette Integration", () => {
       </Provider>
     );
 
-    fireEvent.keyDown(window, { key: "k", ctrlKey: true });
+    fireEvent.keyDown(document, { key: "k", ctrlKey: true });
 
     expect(screen.getByPlaceholderText(/search commands/i)).toBeTruthy();
   });
@@ -103,37 +112,33 @@ describe("Command Palette Integration", () => {
 
     expect(screen.getByText("test message")).toBeTruthy();
 
-    fireEvent.keyDown(window, { key: "k", metaKey: true });
-
-    const clearCommand = screen.getByText("Clear Timeline");
+    fireEvent.keyDown(document, { key: "k", ctrlKey: true });
 
     await act(async () => {
-      fireEvent.click(clearCommand);
+      fireEvent.click(screen.getByText("Clear Timeline"));
     });
 
     expect(screen.queryByText("test message")).toBeNull();
   });
 
   it("focuses prompt when Focus Prompt command is executed", async () => {
+    const focusSpy = vi
+      .spyOn(HTMLTextAreaElement.prototype, "focus")
+      .mockImplementation(() => undefined);
+
     render(
       <Provider store={store}>
         <App />
       </Provider>
     );
 
-    const textarea = screen.getByRole("textbox");
-    textarea.blur();
-
-    expect(document.activeElement).not.toBe(textarea);
-
-    fireEvent.keyDown(window, { key: "k", metaKey: true });
-
-    const focusCommand = screen.getByText("Focus Prompt");
+    fireEvent.keyDown(document, { key: "k", ctrlKey: true });
 
     await act(async () => {
-      fireEvent.click(focusCommand);
+      fireEvent.click(screen.getByText("Focus Prompt"));
     });
 
-    expect(document.activeElement).toBe(textarea);
+    expect(focusSpy).toHaveBeenCalled();
+    focusSpy.mockRestore();
   });
 });

@@ -43,12 +43,14 @@ export function CommandPalette({ commands }: CommandPaletteProps): JSX.Element {
               key={command.id}
               keywords={command.keywords}
               onSelect={() => {
-                try {
-                  command.execute();
-                } catch (error) {
-                  console.error("Command execution failed:", error);
-                }
                 setOpen(false);
+                queueMicrotask(() => {
+                  try {
+                    command.execute();
+                  } catch (error) {
+                    console.error("Command execution failed:", error);
+                  }
+                });
               }}
             >
               <div className="flex flex-col">
