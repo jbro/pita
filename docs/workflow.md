@@ -5,6 +5,7 @@
 - Git repository initialized.
 - Main branch is `main`.
 - Local worktree directory is `.worktrees/`.
+- Bun lockfile authority is `bun.lock` (do not use `bun.lockb` in plans, commands, or commits).
 
 ## Operating Model
 

@@ -87,7 +87,7 @@ Expected: No errors
 **Step 6: Commit**
 
 ```bash
-git add package.json bun.lockb src/renderer/store/
+git add package.json bun.lock src/renderer/store/
 git commit -m "feat: add Jotai and create store infrastructure"
 ```
 

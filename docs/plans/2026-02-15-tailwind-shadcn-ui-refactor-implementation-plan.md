@@ -51,7 +51,7 @@ export default {
 **Step 4: Commit**
 
 ```bash
-git add package.json bun.lockb postcss.config.js
+git add package.json bun.lock postcss.config.js
 git commit -m "deps: add Tailwind CSS and dependencies"
 ```
 
@@ -597,7 +597,7 @@ Expected: All tests PASS (command palette tests should still work)
 **Step 4: Commit**
 
 ```bash
-git add package.json bun.lockb
+git add package.json bun.lock
 git commit -m "deps: remove fuse.js (replaced by shadcn Command built-in search)"
 ```
 

@@ -36,7 +36,7 @@ Expected: Clean install, no errors
 **Step 3: Commit**
 
 ```bash
-git add package.json bun.lockb
+git add package.json bun.lock
 git commit -m "deps: add fuse.js for command palette fuzzy search"
 ```
 
