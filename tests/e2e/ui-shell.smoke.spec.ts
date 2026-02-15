@@ -27,3 +27,28 @@ test("phase1b send stream abort smoke", async () => {
     await electronApp.close();
   }
 });
+
+test("command palette opens and closes", async () => {
+  const electronApp = await electron.launch({
+    args: ["dist/main/main.js"]
+  });
+
+  try {
+    const window = await electronApp.firstWindow();
+
+    const promptInput = window.getByPlaceholder("Ask Pi to continue…");
+    await expect(promptInput).toBeVisible();
+    await promptInput.click();
+
+    await window.keyboard.press("Control+K");
+
+    const search = window.getByPlaceholder(/search commands/i);
+    await expect(search).toBeVisible();
+
+    await window.keyboard.press("Escape");
+
+    await expect(search).toBeHidden();
+  } finally {
+    await electronApp.close();
+  }
+});
