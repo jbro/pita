@@ -33,10 +33,17 @@ body {
 .app-header {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #9ba4bc;
+}
+
+.app-header-logo {
+  height: 32px;
+  width: auto;
 }
 
 .app-header-meta {

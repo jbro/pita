@@ -6,6 +6,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PromptComposerPanel, type PromptComposerHandle } from "./components/PromptComposerPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
 import { useSessionTimeline } from "./hooks/useSessionTimeline";
+import logoSvg from "../../assets/logo.svg";
 
 export function App(): JSX.Element {
   const {
@@ -106,6 +107,7 @@ export function App(): JSX.Element {
             <div>Pita · Phase 1 UI Shell</div>
             <div className="app-header-shortcut-hint">⌘K / Ctrl+K</div>
           </div>
+          <img src={logoSvg} alt="Pita logo" className="app-header-logo" />
         </header>
 
         <main className="app-main">
