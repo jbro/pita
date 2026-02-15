@@ -102,7 +102,7 @@ describe('Event Handlers', () => {
       expect(testStore.get(runStateAtom)).toBe('error');
       const items = testStore.get(timelineItemsAtom);
       expect(items).toHaveLength(1);
-      expect(items[0].role).toBe('system');
+      expect(items[0].role).toBe('tool');
       expect(items[0].text).toContain('test error');
     });
   });

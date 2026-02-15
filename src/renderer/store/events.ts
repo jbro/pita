@@ -1,4 +1,4 @@
-import type { Store } from 'jotai';
+import type { Store } from 'jotai/vanilla/store';
 import { store as defaultStore } from './index';
 import {
   timelineItemsAtom,
@@ -39,7 +39,7 @@ export function handleTimelineEvent(
 
       case 'response.chunk': {
         const current = store.get(timelineItemsAtom);
-        const updated = current.map((item) =>
+        const updated = current.map((item: TimelineItem) =>
           item.id === event.messageId
             ? { ...item, text: item.text + event.chunk }
             : item
@@ -56,10 +56,17 @@ export function handleTimelineEvent(
       case 'response.abort': {
         // Option C: Append to last assistant message
         const current = store.get(timelineItemsAtom);
-        const lastAssistantIndex = current.findLastIndex((item) => item.role === 'assistant');
+        // Find last assistant message by iterating backwards
+        let lastAssistantIndex = -1;
+        for (let i = current.length - 1; i >= 0; i--) {
+          if (current[i].role === 'assistant') {
+            lastAssistantIndex = i;
+            break;
+          }
+        }
         
         if (lastAssistantIndex >= 0) {
-          const updated = current.map((item, index) =>
+          const updated = current.map((item: TimelineItem, index: number) =>
             index === lastAssistantIndex
               ? { ...item, text: item.text + '\n\n[aborted]' }
               : item
@@ -80,7 +87,7 @@ export function handleTimelineEvent(
         const current = store.get(timelineItemsAtom);
         const errorItem: TimelineItem = {
           id: `error-${Date.now()}`,
-          role: 'system',
+          role: 'tool',
           text: `Error: ${event.message}`,
         };
         store.set(timelineItemsAtom, [...current, errorItem]);

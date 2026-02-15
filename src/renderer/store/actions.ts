@@ -1,4 +1,4 @@
-import type { Store } from 'jotai';
+import type { Store } from 'jotai/vanilla/store';
 import { store as defaultStore } from './index';
 import {
   timelineItemsAtom,
