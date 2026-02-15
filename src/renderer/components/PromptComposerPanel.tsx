@@ -214,7 +214,7 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
                 setText(event.target.value);
               }}
               onKeyDown={handleKeyDown}
-              className="max-h-[220px] min-h-[1.6rem] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-foreground focus-visible:ring-0"
+              className="max-h-[220px] min-h-[1.6rem] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-foreground outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             {isRunning ? (
               <div

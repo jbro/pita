@@ -52,7 +52,7 @@ export function TimelinePanel({ items }: TimelinePanelProps): JSX.Element {
   return (
     <ScrollArea
       ref={scrollRootRef}
-      className="mx-auto h-full w-[65%] px-12 pb-20 pt-6"
+      className="mx-auto h-full w-[65%] px-12 pb-32 pt-6"
       data-testid="timeline-panel"
       aria-label="Timeline panel"
     >
