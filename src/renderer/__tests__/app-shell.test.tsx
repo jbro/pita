@@ -9,4 +9,10 @@ describe("App shell", () => {
     expect(screen.getByTestId("timeline-panel")).toBeTruthy();
     expect(screen.getByTestId("prompt-composer-panel")).toBeTruthy();
   });
+
+  it("shows command palette shortcut hint in the header", () => {
+    render(<App />);
+
+    expect(screen.getByText("⌘K / Ctrl+K")).toBeTruthy();
+  });
 });

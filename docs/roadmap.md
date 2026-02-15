@@ -22,8 +22,10 @@ Completed:
 - Steer (Enter while streaming) and queue follow-up (Alt+Enter while streaming) with pending count display.
 - Confirm-only prompt overlay flow across runtime adapter, orchestrator, IPC, preload, and composer replacement UI.
 
+Completed in V1:
+- Command palette with fuzzy search (Cmd/Ctrl+K), Clear Timeline and Focus Prompt commands.
+
 Remaining:
-- Command palette behavior beyond placeholder.
 - Foreground-slot/background-queue orchestration parity work.
 - Multi-session behavior beyond architecture-level design.
 

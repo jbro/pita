@@ -42,6 +42,7 @@ What it does:
    - preload session bridge is available (`window.pita.session.sendPrompt`)
    - prompt input exists and `Ctrl+Enter` can submit
    - timeline receives at least one runtime-driven update after submit
+   - command palette checklist flow passes (open, focus, fuzzy filter, keyboard navigation, clear timeline, focus prompt, Escape close, backdrop close)
 
 ## Manual smoke checklist
 
@@ -62,6 +63,13 @@ Confirm:
 - Pressing `Ctrl+Enter` sends while idle and steers while running.
 - Pressing `Alt+Enter` sends while idle and queues follow-up while running.
 - Pressing `Esc` clears prompt while idle and aborts while running.
+- Command palette opens via `Cmd/Ctrl+K` and auto-focuses the search input.
+- Command palette fuzzy filtering works (for example, `clear` matches `Clear Timeline`).
+- Command palette supports arrow-key navigation and Enter execution.
+- `Clear Timeline` clears existing timeline entries.
+- `Focus Prompt` moves focus to the prompt textarea.
+- Pressing `Esc` closes the command palette.
+- Clicking the command palette backdrop closes it.
 - No console/runtime errors or preload/IPC exceptions appear while running the prompt lifecycle.
 - Confirm overlay request path (when triggered) replaces the composer UI with confirm/cancel actions.
 - After overlay resolution, normal composer input/actions are restored.

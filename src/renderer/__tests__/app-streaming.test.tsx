@@ -1,7 +1,8 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PromptOverlayEvent, PromptOverlaySubmitRequest, SessionTimelineEvent } from "../../shared/ipc";
 import { App } from "../App";
+import { useSessionTimeline } from "../hooks/useSessionTimeline";
 
 describe("App streaming timeline", () => {
   let timelineListener: ((event: SessionTimelineEvent) => void) | undefined;
@@ -106,5 +107,21 @@ describe("App streaming timeline", () => {
     expect(helloMatches.length).toBeGreaterThanOrEqual(1);
     const timelineMatch = helloMatches.find((el) => el.tagName === "SPAN");
     expect(timelineMatch).toBeTruthy();
+  });
+
+  it("clears timeline when clear is called", async () => {
+    const { result } = renderHook(() => useSessionTimeline());
+
+    act(() => {
+      result.current.addUserMessage("test message");
+    });
+
+    expect(result.current.items).toHaveLength(1);
+
+    act(() => {
+      result.current.clearTimeline();
+    });
+
+    expect(result.current.items).toHaveLength(0);
   });
 });
