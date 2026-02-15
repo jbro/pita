@@ -1,75 +1,62 @@
-import { useEffect, useRef, useState } from "react";
-import { type PromptOverlayEvent, type PromptOverlayRequestEvent } from "../shared/ipc";
+import { useEffect, useRef } from "react";
 import { createCommandRegistry } from "./commands/registry";
 import { CommandPalette } from "./components/CommandPalette";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PromptComposerPanel, type PromptComposerHandle } from "./components/PromptComposerPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
-import { useSessionTimeline } from "./hooks/useSessionTimeline";
+import { useAtomValue, useSetAtom } from "./store";
+import {
+  timelineItemsAtom,
+  runStateAtom,
+  steerCountAtom,
+  followUpCountAtom,
+  activeConfirmOverlayAtom,
+  paletteOpenAtom,
+} from "./store/atoms";
+import {
+  addUserMessage,
+  addSteerMessage,
+  addFollowUpMessage,
+  clearTimeline,
+} from "./store/actions";
+import { initializeEventListeners } from "./store/events";
 import logoSvg from "../../assets/logo.svg";
 
 export function App(): JSX.Element {
-  const {
-    items,
-    runState,
-    steerCount,
-    followUpCount,
-    addUserMessage,
-    addSteerMessage,
-    addQueueMessage,
-    clearTimeline
-  } = useSessionTimeline();
-  const [activeConfirmOverlay, setActiveConfirmOverlay] =
-    useState<PromptOverlayRequestEvent | null>(null);
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const items = useAtomValue(timelineItemsAtom);
+  const runState = useAtomValue(runStateAtom);
+  const steerCount = useAtomValue(steerCountAtom);
+  const followUpCount = useAtomValue(followUpCountAtom);
+  const activeConfirmOverlay = useAtomValue(activeConfirmOverlayAtom);
+  const isPaletteOpen = useAtomValue(paletteOpenAtom);
+  const setIsPaletteOpen = useSetAtom(paletteOpenAtom);
+  
   const promptRef = useRef<PromptComposerHandle>(null);
 
   useEffect(() => {
-    const sessionApi = window.pita?.session;
-
-    if (!sessionApi) {
-      return;
-    }
-
-    const unsubscribe = sessionApi.onPromptOverlayEvent((event: PromptOverlayEvent) => {
-      if (event.type === "prompt_overlay_request" && event.kind === "confirm") {
-        setActiveConfirmOverlay(event);
-        return;
-      }
-
-      if (
-        event.type === "prompt_overlay_resolved" &&
-        activeConfirmOverlay?.requestId === event.requestId
-      ) {
-        setActiveConfirmOverlay(null);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [activeConfirmOverlay]);
+    const cleanup = initializeEventListeners();
+    return cleanup;
+  }, []);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
         setIsPaletteOpen(true);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [setIsPaletteOpen]);
 
   const commands = createCommandRegistry({
-    clearTimeline,
+    clearTimeline: () => clearTimeline(),
     focusPrompt: () => {
       promptRef.current?.focus();
-    }
+    },
   });
 
   const handleSend = async (text: string): Promise<void> => {
@@ -83,7 +70,7 @@ export function App(): JSX.Element {
   };
 
   const handleFollowUp = async (text: string): Promise<void> => {
-    addQueueMessage(text);
+    addFollowUpMessage(text);
     await window.pita.session.followUp(text);
   };
 

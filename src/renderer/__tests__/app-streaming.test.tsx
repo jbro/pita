@@ -1,7 +1,19 @@
 import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Provider } from "jotai";
 import type { PromptOverlayEvent, PromptOverlaySubmitRequest, SessionTimelineEvent } from "../../shared/ipc";
 import { App } from "../App";
+import { store } from "../store";
+import {
+  timelineItemsAtom,
+  runStateAtom,
+  steerCountAtom,
+  followUpCountAtom,
+  activeConfirmOverlayAtom,
+  paletteOpenAtom,
+  promptTextAtom,
+  promptOverlayErrorAtom,
+} from "../store/atoms";
 import { useSessionTimeline } from "../hooks/useSessionTimeline";
 
 describe("App streaming timeline", () => {
@@ -11,6 +23,16 @@ describe("App streaming timeline", () => {
   const abort = vi.fn(async () => undefined);
 
   beforeEach(() => {
+    // Reset store state between tests
+    store.set(timelineItemsAtom, []);
+    store.set(runStateAtom, 'idle');
+    store.set(steerCountAtom, 0);
+    store.set(followUpCountAtom, 0);
+    store.set(activeConfirmOverlayAtom, null);
+    store.set(paletteOpenAtom, false);
+    store.set(promptTextAtom, '');
+    store.set(promptOverlayErrorAtom, null);
+
     timelineListener = undefined;
     overlayListener = undefined;
     sendPrompt.mockClear();
@@ -54,7 +76,11 @@ describe("App streaming timeline", () => {
   });
 
   it("subscribes to timeline events, appends streamed content, and shows errors", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     expect(window.pita.session.onTimelineEvent).toHaveBeenCalledTimes(1);
 
@@ -66,11 +92,15 @@ describe("App streaming timeline", () => {
     });
 
     expect(screen.getByText("Hello world")).toBeTruthy();
-    expect(screen.getByText("boom")).toBeTruthy();
+    expect(screen.getByText("Error: boom")).toBeTruthy();
   });
 
   it("switches composer into confirm overlay mode on prompt_overlay_request", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     act(() => {
       overlayListener?.({
@@ -92,7 +122,11 @@ describe("App streaming timeline", () => {
   });
 
   it("appends a user message to the timeline when Ctrl+Enter sends", async () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…");
     fireEvent.change(input, { target: { value: "hello world" } });

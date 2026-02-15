@@ -1,11 +1,23 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Provider } from "jotai";
 import type {
   PromptOverlayEvent,
   PromptOverlaySubmitRequest,
   SessionTimelineEvent
 } from "../../shared/ipc";
 import { App } from "../App";
+import { store } from "../store";
+import {
+  timelineItemsAtom,
+  runStateAtom,
+  steerCountAtom,
+  followUpCountAtom,
+  activeConfirmOverlayAtom,
+  paletteOpenAtom,
+  promptTextAtom,
+  promptOverlayErrorAtom,
+} from "../store/atoms";
 
 function setupPitaMock() {
   const sendPrompt = vi.fn(async () => undefined);
@@ -67,11 +79,25 @@ describe("Prompt shortcuts integration", () => {
   let mock: ReturnType<typeof setupPitaMock>;
 
   beforeEach(() => {
+    // Reset store state between tests
+    store.set(timelineItemsAtom, []);
+    store.set(runStateAtom, 'idle');
+    store.set(steerCountAtom, 0);
+    store.set(followUpCountAtom, 0);
+    store.set(activeConfirmOverlayAtom, null);
+    store.set(paletteOpenAtom, false);
+    store.set(promptTextAtom, '');
+    store.set(promptOverlayErrorAtom, null);
+
     mock = setupPitaMock();
   });
 
   it("Alt+Enter sends normally when idle", async () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…");
     fireEvent.change(input, { target: { value: "idle prompt" } });
@@ -86,7 +112,11 @@ describe("Prompt shortcuts integration", () => {
   });
 
   it("Alt+Enter queues while running and adds italic QUEUE timeline item", async () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…");
     fireEvent.change(input, { target: { value: "queued command" } });
@@ -101,13 +131,17 @@ describe("Prompt shortcuts integration", () => {
     expect(mock.steer).not.toHaveBeenCalled();
 
     const timeline = screen.getByTestId("timeline-panel");
-    expect(within(timeline).getByText("queue")).toBeTruthy();
+    expect(within(timeline).getByText("follow-up")).toBeTruthy();
     const queuedText = within(timeline).getByText("queued command");
     expect(queuedText.className).toContain("timeline-command-text");
   });
 
   it("Ctrl+Enter steers while running and adds italic STEER timeline item", async () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…");
     fireEvent.change(input, { target: { value: "steer command" } });

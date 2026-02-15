@@ -1,11 +1,23 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Provider } from "jotai";
 import type {
   PromptOverlayEvent,
   PromptOverlaySubmitRequest,
   SessionTimelineEvent
 } from "../../shared/ipc";
 import { App } from "../App";
+import { store } from "../store";
+import {
+  timelineItemsAtom,
+  runStateAtom,
+  steerCountAtom,
+  followUpCountAtom,
+  activeConfirmOverlayAtom,
+  paletteOpenAtom,
+  promptTextAtom,
+  promptOverlayErrorAtom,
+} from "../store/atoms";
 
 function setupPitaMock() {
   const sendPrompt = vi.fn(async () => undefined);
@@ -79,11 +91,25 @@ describe("Prompt composer runtime wiring", () => {
   let mock: ReturnType<typeof setupPitaMock>;
 
   beforeEach(() => {
+    // Reset store state between tests
+    store.set(timelineItemsAtom, []);
+    store.set(runStateAtom, 'idle');
+    store.set(steerCountAtom, 0);
+    store.set(followUpCountAtom, 0);
+    store.set(activeConfirmOverlayAtom, null);
+    store.set(paletteOpenAtom, false);
+    store.set(promptTextAtom, '');
+    store.set(promptOverlayErrorAtom, null);
+
     mock = setupPitaMock();
   });
 
   it("sends prompts with Ctrl+Enter while idle and aborts with Escape when running", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
 
@@ -100,7 +126,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("shows busy indicator while running", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     expect(screen.queryByLabelText("Agent is busy")).toBeNull();
 
@@ -110,7 +140,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Enter inserts newline while running", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "fix" } });
@@ -125,7 +159,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Ctrl+Enter while running calls steer", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "fix the bug" } });
@@ -139,7 +177,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Alt+Enter while running calls followUp", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "then run tests" } });
@@ -154,7 +196,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Enter inserts newline while idle", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "hello" } });
@@ -167,7 +213,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Ctrl+Enter while idle calls sendPrompt", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "hello" } });
@@ -180,7 +230,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Alt+Enter while idle calls sendPrompt", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "hello" } });
@@ -192,7 +246,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Escape clears prompt while idle", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
     fireEvent.change(input, { target: { value: "clear me" } });
@@ -204,7 +262,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("Escape aborts while running", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
 
@@ -217,7 +279,11 @@ describe("Prompt composer runtime wiring", () => {
 
 
   it("confirm overlay confirm action calls submitPromptOverlay", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     mock.emitOverlay({
       type: "prompt_overlay_request",
@@ -240,7 +306,11 @@ describe("Prompt composer runtime wiring", () => {
   });
 
   it("confirm overlay cancel action calls cancelPromptOverlay", () => {
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     mock.emitOverlay({
       type: "prompt_overlay_request",
@@ -262,7 +332,11 @@ describe("Prompt composer runtime wiring", () => {
   it("shows inline error and keeps overlay active when submitPromptOverlay rejects", async () => {
     mock.submitPromptOverlay.mockRejectedValueOnce(new Error("submit failed"));
 
-    render(<App />);
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
 
     mock.emitOverlay({
       type: "prompt_overlay_request",
