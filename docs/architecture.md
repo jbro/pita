@@ -30,7 +30,9 @@ Responsibilities:
 - Display streaming updates and tool blocks.
 
 Implementation notes:
-- Timeline state is event-driven through a session timeline hook.
+- State management uses Jotai atoms and actions in `src/renderer/store/`.
+- Event handlers in `store/events.ts` process IPC timeline events and update atoms.
+- The store exports atoms (timeline items, run state, counts), actions (add messages, clear timeline), and event initialization.
 - Prompt composer controls are wired to preload session APIs.
 - Keyboard-first prompt controls: Enter inserts newline; Ctrl+Enter sends (idle) or steers (running); Alt+Enter sends (idle) or queues follow-up (running); Esc clears (idle) or aborts (running).
 - Normal composer mode uses no action buttons; a busy spinner indicates running state.

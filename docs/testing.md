@@ -19,6 +19,12 @@ What they cover:
 - `bun run typecheck`: TypeScript checks for renderer and Electron/main code.
 - `bun run test`: Vitest + RTL DOM tests for shell and component placeholders.
 
+Test setup notes:
+
+- Integration tests that render `<App />` must wrap it in Jotai's `<Provider store={store}>`.
+- Tests reset store state in `beforeEach` hooks to ensure isolation between test cases.
+- Store atoms, actions, and events are exported from `src/renderer/store/index.ts`.
+
 Focused confirm-only prompt overlay checks:
 
 ```bash

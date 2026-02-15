@@ -24,6 +24,7 @@ Completed:
 
 Completed in V1:
 - Command palette with fuzzy search (Cmd/Ctrl+K), Clear Timeline and Focus Prompt commands.
+- State management refactored to Jotai (centralized atoms, actions, and event handlers).
 
 Remaining:
 - Foreground-slot/background-queue orchestration parity work.
