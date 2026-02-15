@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { App } from "../App";
 
@@ -6,6 +6,7 @@ describe("Command Palette Integration", () => {
   beforeEach(() => {
     (window as typeof window & {
       pita: {
+        version: string;
         session: {
           sendPrompt: ReturnType<typeof vi.fn>;
           abort: ReturnType<typeof vi.fn>;
@@ -19,6 +20,7 @@ describe("Command Palette Integration", () => {
         };
       };
     }).pita = {
+      version: "test",
       session: {
         sendPrompt: vi.fn().mockResolvedValue(undefined),
         abort: vi.fn().mockResolvedValue(undefined),
@@ -31,10 +33,6 @@ describe("Command Palette Integration", () => {
         cancelPromptOverlay: vi.fn().mockResolvedValue(undefined)
       }
     };
-  });
-
-  afterEach(() => {
-    delete (window as typeof window & { pita?: unknown }).pita;
   });
 
   it("opens command palette with Cmd+K", () => {
