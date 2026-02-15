@@ -71,16 +71,20 @@ export function App(): JSX.Element {
 
   return (
     <ErrorBoundary>
-      <div className="flex h-screen flex-col bg-background text-foreground">
-        <header className="flex items-center justify-between border-b px-4 py-3">
-          <div className="flex flex-col items-start gap-0.5 text-sm uppercase tracking-wide text-muted-foreground">
-            <div>Pita · Phase 1 UI Shell</div>
-            <div className="text-xs normal-case tracking-normal text-muted-foreground/80">⌘K / Ctrl+K</div>
+      <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+        <header className="shrink-0 border-b px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col items-start gap-0.5 text-sm uppercase tracking-wide text-muted-foreground">
+              <div>Pita · Phase 1 UI Shell</div>
+              <div className="text-xs normal-case tracking-normal text-muted-foreground/80">
+                ⌘K / Ctrl+K
+              </div>
+            </div>
+            <img src={logoSvg} alt="Pita logo" className="h-8 w-auto" />
           </div>
-          <img src={logoSvg} alt="Pita logo" className="h-8 w-auto" />
         </header>
 
-        <main className="flex-1 overflow-hidden">
+        <main className="min-h-0 flex-1 overflow-hidden">
           <TimelinePanel items={items} />
         </main>
 
