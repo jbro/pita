@@ -3,11 +3,14 @@ import {
   useRef,
   type KeyboardEvent,
   forwardRef,
-  useImperativeHandle
+  useImperativeHandle,
 } from "react";
 import type { PromptOverlayRequestEvent, SessionRunState } from "../../shared/ipc";
 import { useAtom } from "../store";
 import { promptTextAtom, promptOverlayErrorAtom } from "../store/atoms";
+import { Card, CardContent } from "./ui/card";
+import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
 
 interface PromptComposerPanelProps {
   runState?: SessionRunState;
@@ -38,7 +41,7 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
       onFollowUp,
       onAbort,
       onConfirmOverlaySubmit,
-      onConfirmOverlayCancel
+      onConfirmOverlayCancel,
     },
     ref
   ): JSX.Element {
@@ -49,12 +52,12 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
     useImperativeHandle(ref, () => ({
       focus: () => {
         textareaRef.current?.focus();
-      }
+      },
     }));
 
     useEffect(() => {
       setOverlayError(null);
-    }, [activeConfirmOverlay?.requestId]);
+    }, [activeConfirmOverlay?.requestId, setOverlayError]);
 
     useEffect(() => {
       const textarea = textareaRef.current;
@@ -88,7 +91,6 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
 
       setText("");
       textareaRef.current?.focus();
-
       await action();
     };
 
@@ -162,57 +164,76 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
 
     if (activeConfirmOverlay) {
       return (
-        <section
-          className="panel composer-panel"
+        <Card
+          className="fixed bottom-4 left-1/2 z-30 w-[55%] -translate-x-1/2 border-[#2a3244] bg-[#141925]"
           data-testid="prompt-composer-panel"
           aria-label="Prompt composer panel"
         >
-          <h2>{activeConfirmOverlay.title}</h2>
-          <p>{activeConfirmOverlay.message}</p>
-          {overlayError && (
-            <p data-testid="confirm-overlay-error" role="alert">
-              {overlayError}
-            </p>
-          )}
-          <div className="composer-actions">
-            <button type="button" onClick={() => void handleConfirm()}>
-              {activeConfirmOverlay.confirmLabel}
-            </button>
-            <button type="button" onClick={() => void handleCancel()}>
-              {activeConfirmOverlay.cancelLabel}
-            </button>
-          </div>
-        </section>
+          <CardContent className="space-y-3 p-4">
+            <h2 className="text-base font-semibold">{activeConfirmOverlay.title}</h2>
+            <p className="text-sm text-muted-foreground">{activeConfirmOverlay.message}</p>
+            {overlayError ? (
+              <p data-testid="confirm-overlay-error" role="alert" className="text-sm text-destructive">
+                {overlayError}
+              </p>
+            ) : null}
+            <div className="flex gap-2">
+              <Button type="button" onClick={() => void handleConfirm()}>
+                {activeConfirmOverlay.confirmLabel}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => void handleCancel()}>
+                {activeConfirmOverlay.cancelLabel}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       );
     }
 
+    const queueStatus =
+      steerCount > 0 || followUpCount > 0
+        ? `${steerCount > 0 ? `Steer: ${steerCount}` : ""}${
+            steerCount > 0 && followUpCount > 0 ? " · " : ""
+          }${followUpCount > 0 ? `Follow-up: ${followUpCount}` : ""}`
+        : null;
+
     return (
-      <section
-        className="panel composer-panel"
+      <Card
+        className="fixed bottom-4 left-1/2 z-30 w-[55%] -translate-x-1/2 border-[#2a3244] bg-[#141925]"
         data-testid="prompt-composer-panel"
         aria-label="Prompt composer panel"
       >
-        <div className="composer-input-row">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            placeholder="Ask Pi to continue…"
-            value={text}
-            onChange={(event) => {
-              setText(event.target.value);
-            }}
-            onKeyDown={handleKeyDown}
-          />
-          {isRunning && (
-            <div className="composer-busy-indicator" aria-label="Agent is busy" title="Agent is busy" />
-          )}
-        </div>
-        <p className="composer-shortcuts">
-          {isRunning
-            ? "Ctrl+Enter: steer · Alt+Enter: queue follow-up · Esc: cancel"
-            : "Ctrl+Enter: send · Esc: clear prompt"}
-        </p>
-      </section>
+        <CardContent className="space-y-1.5 p-3">
+          <div className="flex items-end gap-2.5">
+            <Textarea
+              ref={textareaRef}
+              rows={1}
+              placeholder="Ask Pi to continue…"
+              value={text}
+              onChange={(event) => {
+                setText(event.target.value);
+              }}
+              onKeyDown={handleKeyDown}
+              className="max-h-[220px] min-h-[1.6rem] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-foreground focus-visible:ring-0"
+            />
+            {isRunning ? (
+              <div
+                className="mb-2 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-[#3a4254] border-t-[#8ea5ff]"
+                aria-label="Agent is busy"
+                title="Agent is busy"
+              />
+            ) : null}
+          </div>
+          <div className="flex items-center justify-between text-xs text-[#8f98ad]">
+            <p>
+              {isRunning
+                ? "Ctrl+Enter: steer · Alt+Enter: queue follow-up · Esc: cancel"
+                : "Ctrl+Enter: send · Esc: clear prompt"}
+            </p>
+            {queueStatus ? <p>{queueStatus}</p> : null}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 );
