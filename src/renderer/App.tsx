@@ -1,15 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type PromptOverlayEvent, type PromptOverlayRequestEvent } from "../shared/ipc";
+import { createCommandRegistry } from "./commands/registry";
+import { CommandPalette } from "./components/CommandPalette";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { PromptComposerPanel } from "./components/PromptComposerPanel";
+import { PromptComposerPanel, type PromptComposerHandle } from "./components/PromptComposerPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
 import { useSessionTimeline } from "./hooks/useSessionTimeline";
 
 export function App(): JSX.Element {
-  const { items, runState, steerCount, followUpCount, addUserMessage, addSteerMessage, addQueueMessage } =
-    useSessionTimeline();
+  const {
+    items,
+    runState,
+    steerCount,
+    followUpCount,
+    addUserMessage,
+    addSteerMessage,
+    addQueueMessage,
+    clearTimeline
+  } = useSessionTimeline();
   const [activeConfirmOverlay, setActiveConfirmOverlay] =
     useState<PromptOverlayRequestEvent | null>(null);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const promptRef = useRef<PromptComposerHandle>(null);
 
   useEffect(() => {
     const sessionApi = window.pita?.session;
@@ -36,6 +48,28 @@ export function App(): JSX.Element {
       unsubscribe();
     };
   }, [activeConfirmOverlay]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setIsPaletteOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const commands = createCommandRegistry({
+    clearTimeline,
+    focusPrompt: () => {
+      promptRef.current?.focus();
+    }
+  });
 
   const handleSend = async (text: string): Promise<void> => {
     addUserMessage(text);
@@ -74,6 +108,7 @@ export function App(): JSX.Element {
         </main>
 
         <PromptComposerPanel
+          ref={promptRef}
           runState={runState}
           steerCount={steerCount}
           followUpCount={followUpCount}
@@ -84,6 +119,12 @@ export function App(): JSX.Element {
           onAbort={handleAbort}
           onConfirmOverlaySubmit={handleConfirmOverlaySubmit}
           onConfirmOverlayCancel={handleConfirmOverlayCancel}
+        />
+
+        <CommandPalette
+          isOpen={isPaletteOpen}
+          commands={commands}
+          onClose={() => setIsPaletteOpen(false)}
         />
       </div>
     </ErrorBoundary>
