@@ -277,6 +277,41 @@ describe("Prompt composer runtime wiring", () => {
     expect(mock.abort).toHaveBeenCalledTimes(1);
   });
 
+  it("Ctrl+Enter while aborting does not call sendPrompt", () => {
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
+
+    const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
+    fireEvent.change(input, { target: { value: "should not become sendPrompt" } });
+
+    mock.emit({ type: "state", state: "aborting" });
+
+    fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
+
+    expect(mock.sendPrompt).not.toHaveBeenCalled();
+    expect(mock.steer).toHaveBeenCalledWith("should not become sendPrompt");
+  });
+
+  it("Alt+Enter while aborting does not call sendPrompt", () => {
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
+
+    const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
+    fireEvent.change(input, { target: { value: "should stay followUp while aborting" } });
+
+    mock.emit({ type: "state", state: "aborting" });
+
+    fireEvent.keyDown(input, { key: "Enter", altKey: true });
+
+    expect(mock.sendPrompt).not.toHaveBeenCalled();
+    expect(mock.followUp).toHaveBeenCalledWith("should stay followUp while aborting");
+  });
 
   it("confirm overlay confirm action calls submitPromptOverlay", () => {
     render(

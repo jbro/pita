@@ -66,7 +66,7 @@ export const PromptComposerPanel = forwardRef<PromptComposerHandle, PromptCompos
       textarea.style.overflowY = textarea.scrollHeight > 220 ? "auto" : "hidden";
     }, [text]);
 
-    const isRunning = runState === "running";
+    const isRunning = runState === "running" || runState === "aborting";
     const trimmed = text.trim();
     const hasText = trimmed.length > 0;
 

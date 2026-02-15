@@ -237,6 +237,43 @@ describe("OrchestratorService", () => {
     expect(idleCount).toBe(1);
   });
 
+  it("rejects sendPrompt while an abort is still settling", async () => {
+    let resolveRun: (() => void) | undefined;
+
+    const run = vi.fn((_text: string, callbacks: RuntimeCallbacks): Promise<void> => {
+      callbacks.onStart("msg-1");
+      return new Promise<void>((resolve) => {
+        resolveRun = resolve;
+      });
+    });
+
+    const runtime: RuntimeAdapter = {
+      run,
+      abort: vi.fn(() => {
+        setTimeout(() => {
+          resolveRun?.();
+        }, 10);
+      })
+    };
+
+    const service = new OrchestratorService(runtime);
+
+    const firstRunPromise = service.sendPrompt("first");
+    await Promise.resolve();
+
+    const abortPromise = service.abort();
+
+    await expect(service.sendPrompt("second")).rejects.toThrow(
+      "Agent is already processing. Use steer/followUp while running."
+    );
+
+    await abortPromise;
+    await firstRunPromise;
+
+    expect(runtime.abort).toHaveBeenCalledTimes(1);
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
   it("transitions error then idle when runtime run throws", async () => {
     const runtime: RuntimeAdapter = {
       async run(_text: string, callbacks: RuntimeCallbacks): Promise<void> {

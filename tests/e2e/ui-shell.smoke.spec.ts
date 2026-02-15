@@ -100,3 +100,40 @@ test("command palette checklist smoke", async () => {
     await electronApp.close();
   }
 });
+
+test("abort after queued follow-ups does not emit already-processing error", async () => {
+  const electronApp = await electron.launch({
+    args: ["dist/main/main.js"],
+    env: {
+      ...process.env,
+      PITA_RUNTIME_KIND: "stub",
+      PITA_STUB_RUNTIME_MODE: "manual-abort"
+    }
+  });
+
+  try {
+    const window = await electronApp.firstWindow();
+    const promptInput = window.getByPlaceholder("Ask Pi to continue…");
+
+    await expect(promptInput).toBeVisible();
+
+    await promptInput.fill("first prompt");
+    await promptInput.press("Control+Enter");
+
+    await window.locator(".composer-busy-indicator").waitFor({ state: "visible" });
+
+    await promptInput.fill("queued one");
+    await promptInput.press("Alt+Enter");
+
+    await promptInput.fill("queued two");
+    await promptInput.press("Alt+Enter");
+
+    await promptInput.press("Escape");
+
+    await window.locator(".composer-busy-indicator").waitFor({ state: "hidden" });
+
+    await expect(window.getByText("Error: Agent is already processing", { exact: false })).toHaveCount(0);
+  } finally {
+    await electronApp.close();
+  }
+});

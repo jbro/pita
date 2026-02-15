@@ -21,7 +21,7 @@ export type PromptOverlayRequestListener = (
 
 export interface RuntimeAdapter {
   run(text: string, callbacks: RuntimeCallbacks): Promise<void>;
-  abort(): void;
+  abort(): Promise<void> | void;
   steer?(text: string): void;
   followUp?(text: string): void;
   clearQueue?(): { steering: string[]; followUp: string[] };
@@ -35,6 +35,7 @@ export class OrchestratorService {
   private state: SessionRunState = "idle";
   private steerCount = 0;
   private followUpCount = 0;
+  private activeRunPromise: Promise<void> | undefined;
   private readonly listeners = new Set<TimelineListener>();
   private readonly promptOverlayListeners = new Set<PromptOverlayListener>();
   private activePromptOverlay:
@@ -100,43 +101,58 @@ export class OrchestratorService {
   }
 
   public async sendPrompt(text: string): Promise<void> {
+    if (this.state !== "idle" || this.activeRunPromise) {
+      throw new Error("Agent is already processing. Use steer/followUp while running.");
+    }
+
     this.setState("running");
+    const runPromise = this.runtime.run(text, {
+      onStart: (messageId) => {
+        this.emit({ type: "response.start", messageId });
+      },
+      onChunk: (messageId, chunk) => {
+        this.emit({ type: "response.chunk", messageId, chunk });
+      },
+      onEnd: (messageId) => {
+        this.emit({ type: "response.end", messageId });
+      },
+      onError: (error) => {
+        if (this.state === "aborting") {
+          return;
+        }
+
+        this.setState("error");
+        this.emit({ type: "error", message: error.message });
+      }
+    });
+
+    this.activeRunPromise = runPromise;
 
     try {
-      await this.runtime.run(text, {
-        onStart: (messageId) => {
-          this.emit({ type: "response.start", messageId });
-        },
-        onChunk: (messageId, chunk) => {
-          this.emit({ type: "response.chunk", messageId, chunk });
-        },
-        onEnd: (messageId) => {
-          this.emit({ type: "response.end", messageId });
-        },
-        onError: (error) => {
-          if (this.state === "aborting") {
-            return;
-          }
-
-          this.setState("error");
-          this.emit({ type: "error", message: error.message });
-        }
-      });
+      await runPromise;
     } finally {
+      if (this.activeRunPromise === runPromise) {
+        this.activeRunPromise = undefined;
+      }
       this.resetQueueCounts();
       this.setState("idle");
     }
   }
 
   public async abort(): Promise<void> {
-    if (this.state !== "running") {
+    if (this.state !== "running" || !this.activeRunPromise) {
       return;
     }
 
     this.setState("aborting");
-    this.runtime.abort();
+    await Promise.resolve(this.runtime.abort());
     this.emit({ type: "response.abort" });
-    this.setState("idle");
+
+    try {
+      await this.activeRunPromise;
+    } catch {
+      // sendPrompt handles state/error emission; abort just waits for run teardown.
+    }
   }
 
   public steer(text: string): void {
