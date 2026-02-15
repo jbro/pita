@@ -19,12 +19,10 @@ test("phase1b send stream abort smoke", async () => {
     await expect(promptInput).toBeVisible();
 
     await promptInput.fill("Run smoke runtime prompt");
+    await promptInput.press("Control+Enter");
 
-    const sendButton = window.getByRole("button", { name: "Send" });
-    await expect(sendButton).toBeEnabled();
-    await sendButton.click();
-
-    await expect(window.locator(".timeline-item")).toHaveCount(1);
+    await expect.poll(async () => window.locator(".timeline-item").count()).toBeGreaterThan(0);
+    await expect(window.getByText("Run smoke runtime prompt")).toBeVisible();
   } finally {
     await electronApp.close();
   }

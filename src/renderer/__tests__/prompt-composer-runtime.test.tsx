@@ -82,41 +82,49 @@ describe("Prompt composer runtime wiring", () => {
     mock = setupPitaMock();
   });
 
-  it("sends prompts when idle and toggles abort during running", async () => {
+  it("sends prompts with Ctrl+Enter while idle and aborts with Escape when running", () => {
     render(<App />);
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
-    const sendButton = screen.getByRole("button", { name: /send/i });
-    const abortButton = screen.getByRole("button", { name: /abort/i });
 
     fireEvent.change(input, { target: { value: "Run diagnostics" } });
-    fireEvent.click(sendButton);
+    fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
 
     expect(mock.sendPrompt).toHaveBeenCalledWith("Run diagnostics");
-    expect(abortButton).toHaveProperty("disabled", true);
+    expect(mock.abort).not.toHaveBeenCalled();
 
     mock.emit({ type: "state", state: "running" });
 
-    expect(abortButton).toHaveProperty("disabled", false);
-
-    fireEvent.click(abortButton);
+    fireEvent.keyDown(input, { key: "Escape" });
     expect(mock.abort).toHaveBeenCalledTimes(1);
   });
 
-  it("button label changes to Steer when running", () => {
+  it("shows busy indicator while running", () => {
     render(<App />);
 
-    const input = screen.getByPlaceholderText("Ask Pi to continue…");
-    fireEvent.change(input, { target: { value: "some text" } });
-
-    expect(screen.getByRole("button", { name: /send/i })).toBeTruthy();
+    expect(screen.queryByLabelText("Agent is busy")).toBeNull();
 
     mock.emit({ type: "state", state: "running" });
 
-    expect(screen.getByRole("button", { name: /steer/i })).toBeTruthy();
+    expect(screen.getByLabelText("Agent is busy")).toBeTruthy();
   });
 
-  it("Enter while running calls steer instead of sendPrompt", () => {
+  it("Enter inserts newline while running", () => {
+    render(<App />);
+
+    const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
+    fireEvent.change(input, { target: { value: "fix" } });
+
+    mock.emit({ type: "state", state: "running" });
+
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(mock.steer).not.toHaveBeenCalled();
+    expect(mock.followUp).not.toHaveBeenCalled();
+    expect(mock.sendPrompt).not.toHaveBeenCalled();
+  });
+
+  it("Ctrl+Enter while running calls steer", () => {
     render(<App />);
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
@@ -124,7 +132,7 @@ describe("Prompt composer runtime wiring", () => {
 
     mock.emit({ type: "state", state: "running" });
 
-    fireEvent.keyDown(input, { key: "Enter" });
+    fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
 
     expect(mock.steer).toHaveBeenCalledWith("fix the bug");
     expect(mock.sendPrompt).not.toHaveBeenCalled();
@@ -145,7 +153,7 @@ describe("Prompt composer runtime wiring", () => {
     expect(mock.sendPrompt).not.toHaveBeenCalled();
   });
 
-  it("Enter while idle calls sendPrompt", () => {
+  it("Enter inserts newline while idle", () => {
     render(<App />);
 
     const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
@@ -153,8 +161,22 @@ describe("Prompt composer runtime wiring", () => {
 
     fireEvent.keyDown(input, { key: "Enter" });
 
+    expect(mock.sendPrompt).not.toHaveBeenCalled();
+    expect(mock.steer).not.toHaveBeenCalled();
+    expect(mock.followUp).not.toHaveBeenCalled();
+  });
+
+  it("Ctrl+Enter while idle calls sendPrompt", () => {
+    render(<App />);
+
+    const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
+    fireEvent.change(input, { target: { value: "hello" } });
+
+    fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
+
     expect(mock.sendPrompt).toHaveBeenCalledWith("hello");
     expect(mock.steer).not.toHaveBeenCalled();
+    expect(mock.followUp).not.toHaveBeenCalled();
   });
 
   it("Alt+Enter while idle calls sendPrompt", () => {
@@ -169,60 +191,30 @@ describe("Prompt composer runtime wiring", () => {
     expect(mock.followUp).not.toHaveBeenCalled();
   });
 
-  it("shows pending count when queue status is emitted", () => {
+  it("Escape clears prompt while idle", () => {
     render(<App />);
 
-    expect(screen.queryByTestId("pending-count")).toBeNull();
+    const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
+    fireEvent.change(input, { target: { value: "clear me" } });
 
-    mock.emit({ type: "queue.status", steerCount: 2, followUpCount: 1 });
+    fireEvent.keyDown(input, { key: "Escape" });
 
-    const badge = screen.getByTestId("pending-count");
-    expect(badge.textContent).toBe("Steer: 2 · Follow-up: 1");
+    expect(input.value).toBe("");
+    expect(mock.abort).not.toHaveBeenCalled();
   });
 
-  it("shows separate steer and follow-up queue counts", () => {
+  it("Escape aborts while running", () => {
     render(<App />);
 
-    mock.emit({ type: "queue.status", steerCount: 1, followUpCount: 2 });
-
-    const badge = screen.getByTestId("pending-count");
-    expect(badge.textContent).toBe("Steer: 1 · Follow-up: 2");
-  });
-
-  it("hides pending count when queue resets to zero", () => {
-    render(<App />);
-
-    mock.emit({ type: "queue.status", steerCount: 1, followUpCount: 0 });
-    expect(screen.getByTestId("pending-count")).toBeTruthy();
-
-    mock.emit({ type: "queue.status", steerCount: 0, followUpCount: 0 });
-    expect(screen.queryByTestId("pending-count")).toBeNull();
-  });
-
-  it("resets pending count on state idle", () => {
-    render(<App />);
-
-    mock.emit({ type: "queue.status", steerCount: 2, followUpCount: 0 });
-    expect(screen.getByTestId("pending-count")).toBeTruthy();
-
-    mock.emit({ type: "state", state: "idle" });
-    expect(screen.queryByTestId("pending-count")).toBeNull();
-  });
-
-  it("Steer button click while running calls steer", () => {
-    render(<App />);
-
-    const input = screen.getByPlaceholderText("Ask Pi to continue…");
-    fireEvent.change(input, { target: { value: "do it" } });
+    const input = screen.getByPlaceholderText("Ask Pi to continue…") as HTMLTextAreaElement;
 
     mock.emit({ type: "state", state: "running" });
 
-    const steerButton = screen.getByRole("button", { name: /steer/i });
-    fireEvent.click(steerButton);
+    fireEvent.keyDown(input, { key: "Escape" });
 
-    expect(mock.steer).toHaveBeenCalledWith("do it");
-    expect(mock.sendPrompt).not.toHaveBeenCalled();
+    expect(mock.abort).toHaveBeenCalledTimes(1);
   });
+
 
   it("confirm overlay confirm action calls submitPromptOverlay", () => {
     render(<App />);

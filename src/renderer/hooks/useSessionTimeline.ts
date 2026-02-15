@@ -8,6 +8,8 @@ interface UseSessionTimelineResult {
   steerCount: number;
   followUpCount: number;
   addUserMessage: (text: string) => void;
+  addSteerMessage: (text: string) => void;
+  addQueueMessage: (text: string) => void;
 }
 
 const initialItems: TimelineItem[] = [];
@@ -35,13 +37,44 @@ export function useSessionTimeline(): UseSessionTimelineResult {
   }, []);
 
   const addUserMessage = (text: string): void => {
+    setItems((previous) => [...previous, { id: `user-${Date.now()}`, role: "user", text }]);
+  };
+
+  const addSteerMessage = (text: string): void => {
     setItems((previous) => [
       ...previous,
-      { id: `user-${Date.now()}`, role: "user", text }
+      {
+        id: `steer-${Date.now()}`,
+        role: "user",
+        label: "steer",
+        text,
+        emphasized: true
+      }
     ]);
   };
 
-  return { items, runState, steerCount, followUpCount, addUserMessage };
+  const addQueueMessage = (text: string): void => {
+    setItems((previous) => [
+      ...previous,
+      {
+        id: `queue-${Date.now()}`,
+        role: "user",
+        label: "queue",
+        text,
+        emphasized: true
+      }
+    ]);
+  };
+
+  return {
+    items,
+    runState,
+    steerCount,
+    followUpCount,
+    addUserMessage,
+    addSteerMessage,
+    addQueueMessage
+  };
 }
 
 function applyTimelineEvent(
