@@ -40,7 +40,7 @@ export function App(): JSX.Element {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setIsPaletteOpen(true);
       }
