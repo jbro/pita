@@ -28,7 +28,7 @@ test("phase1b send stream abort smoke", async () => {
   }
 });
 
-test("command palette opens and closes", async () => {
+test("command palette checklist smoke", async () => {
   const electronApp = await electron.launch({
     args: ["dist/main/main.js"]
   });
@@ -38,15 +38,63 @@ test("command palette opens and closes", async () => {
 
     const promptInput = window.getByPlaceholder("Ask Pi to continue…");
     await expect(promptInput).toBeVisible();
-    await promptInput.click();
 
+    await promptInput.fill("timeline should clear");
+    await promptInput.press("Control+Enter");
+    await expect(window.getByText("timeline should clear")).toBeVisible();
+
+    await promptInput.click();
     await window.keyboard.press("Control+K");
 
-    const search = window.getByPlaceholder(/search commands/i);
+    const search = window.getByPlaceholder("Search commands...");
     await expect(search).toBeVisible();
 
-    await window.keyboard.press("Escape");
+    await expect
+      .poll(async () => {
+        return window.evaluate(() => {
+          const active = document.activeElement;
+          return active instanceof HTMLInputElement ? active.placeholder : "";
+        });
+      })
+      .toBe("Search commands...");
 
+    await search.fill("clear");
+    await expect(window.getByRole("button", { name: /clear timeline/i })).toBeVisible();
+
+    await search.press("ArrowDown");
+    await search.press("ArrowUp");
+
+    await search.press("Enter");
+    await expect(window.getByText("timeline should clear")).toBeHidden();
+
+    await promptInput.click();
+    await window.keyboard.press("Control+K");
+    await expect(search).toBeVisible();
+
+    await search.fill("focus");
+    await search.press("Enter");
+
+    await expect
+      .poll(async () => {
+        return window.evaluate(() => {
+          const textarea = document.querySelector(
+            'textarea[placeholder="Ask Pi to continue…"]'
+          );
+          return document.activeElement === textarea;
+        });
+      })
+      .toBe(true);
+
+    await promptInput.click();
+    await window.keyboard.press("Control+K");
+    await expect(search).toBeVisible();
+    await window.keyboard.press("Escape");
+    await expect(search).toBeHidden();
+
+    await promptInput.click();
+    await window.keyboard.press("Control+K");
+    await expect(search).toBeVisible();
+    await window.locator(".command-palette-backdrop").click({ position: { x: 5, y: 5 } });
     await expect(search).toBeHidden();
   } finally {
     await electronApp.close();
