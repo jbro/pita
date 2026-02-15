@@ -1,268 +1,183 @@
-:root {
-  color-scheme: dark;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: #0f1115;
-  color: #e8eaf0;
-  --composer-default-offset: calc(16px + 56px + 12px);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  #root {
+    height: 100vh;
+  }
 }
 
-body {
-  margin: 0;
-  height: 100vh;
-  overflow: hidden;
-  background: #0f1115;
-}
+@layer components {
+  .timeline-background {
+    margin: 0 auto;
+    width: 65%;
+    height: calc(100% - (16px + 56px + 12px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 1.5rem 3rem 1rem;
+  }
 
-#root {
-  height: 100vh;
-}
+  .timeline-background::-webkit-scrollbar {
+    display: none;
+  }
 
-.app-shell {
-  height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 12px;
-  padding: 16px;
-  overflow: hidden;
-}
+  .timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
 
-.app-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 16px;
-  font-size: 14px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #9ba4bc;
-}
+  .timeline-item {
+    display: grid;
+    gap: 4px;
+  }
 
-.app-header-logo {
-  height: 32px;
-  width: auto;
-}
+  .timeline-role {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8ea5ff;
+  }
 
-.app-header-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-}
+  .timeline-command-text {
+    font-style: italic;
+  }
 
-.app-header-shortcut-hint {
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  color: #7f889e;
-}
+  .composer-panel {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    width: 55%;
+    z-index: 30;
+    background: #141925;
+    border: 1px solid #2a3244;
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
 
-.app-main {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  min-height: 0;
-  overflow: hidden;
-}
+  .composer-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
 
-.panel {
-  background: #171a21;
-  border: 1px solid #2c3240;
-  border-radius: 10px;
-  padding: 12px;
-}
+  .composer-shortcuts {
+    margin: 2px 0 0;
+    text-align: right;
+    font-size: 12px;
+    color: #8f98ad;
+  }
 
-.timeline-background {
-  background: transparent;
-  border: 0;
-  margin: 0 auto;
-  width: 65%;
-  height: calc(100% - var(--composer-default-offset));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 1.5rem 3rem 1rem;
-}
+  .composer-busy-indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #3a4254;
+    border-top-color: #8ea5ff;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+    animation: composer-spin 0.8s linear infinite;
+  }
 
-.timeline-background::-webkit-scrollbar {
-  display: none;
-}
+  .composer-panel textarea {
+    flex: 1;
+    min-height: 1.6rem;
+    max-height: 220px;
+    resize: none;
+    border: 0;
+    background: transparent;
+    color: #e8eaf0;
+    padding: 8px 4px;
+    line-height: 1.4;
+  }
 
-.timeline-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
+  .composer-panel textarea:focus {
+    outline: none;
+  }
 
-.timeline-item {
-  display: grid;
-  gap: 4px;
-}
+  .composer-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
 
-.timeline-role {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #8ea5ff;
-}
-
-.timeline-command-text {
-  font-style: italic;
-}
-
-.composer-panel {
-  position: fixed;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  width: 55%;
-  z-index: 30;
-  background: #141925;
-  border: 1px solid #2a3244;
-  border-radius: 14px;
-  padding: 10px 12px;
-}
-
-.composer-input-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.composer-shortcuts {
-  margin: 2px 0 0;
-  text-align: right;
-  font-size: 12px;
-  color: #8f98ad;
-}
-
-.composer-busy-indicator {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #3a4254;
-  border-top-color: #8ea5ff;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-bottom: 8px;
-  animation: composer-spin 0.8s linear infinite;
+  .composer-actions button {
+    border: 1px solid #3a4254;
+    background: #202532;
+    color: #d9def0;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
 }
 
 @keyframes composer-spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-.composer-panel textarea {
-  flex: 1;
-  min-height: 1.6rem;
-  max-height: 220px;
-  resize: none;
-  border: 0;
-  background: transparent;
-  color: #e8eaf0;
-  padding: 8px 4px;
-  line-height: 1.4;
-}
-
-.composer-panel textarea:focus {
-  outline: none;
-}
-
-.composer-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.composer-actions button {
-  border: 1px solid #3a4254;
-  background: #202532;
-  color: #d9def0;
-  border-radius: 8px;
-  padding: 6px 10px;
-}
-
-/* Command Palette */
-
-.command-palette-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 15vh;
-  z-index: 1000;
-}
-
-.command-palette-panel {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-}
-
-.command-palette-search {
-  width: 100%;
-  padding: 16px 20px;
-  background: #1e1e1e;
-  border: none;
-  border-bottom: 1px solid #3c3c3c;
-  color: #e0e0e0;
-  font-size: 16px;
-  outline: none;
-}
-
-.command-palette-search::placeholder {
-  color: #707070;
-}
-
-.command-palette-results {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.command-palette-item {
-  display: block;
-  width: 100%;
-  padding: 12px 20px;
-  background: transparent;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.1s ease;
-  color: #e0e0e0;
-}
-
-.command-palette-item:hover,
-.command-palette-item.selected {
-  background: #2a2a2a;
-}
-
-.command-palette-item-label {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 2px;
-}
-
-.command-palette-item-description {
-  font-size: 12px;
-  color: #909090;
-}
-
-.command-palette-empty {
-  padding: 24px 20px;
-  text-align: center;
-  color: #707070;
-  font-size: 14px;
 }

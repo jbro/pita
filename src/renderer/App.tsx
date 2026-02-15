@@ -4,14 +4,13 @@ import { CommandPalette } from "./components/CommandPalette";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PromptComposerPanel, type PromptComposerHandle } from "./components/PromptComposerPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
-import { useAtomValue, useSetAtom } from "./store";
+import { useAtomValue } from "./store";
 import {
   timelineItemsAtom,
   runStateAtom,
   steerCountAtom,
   followUpCountAtom,
   activeConfirmOverlayAtom,
-  paletteOpenAtom,
 } from "./store/atoms";
 import {
   addUserMessage,
@@ -28,29 +27,13 @@ export function App(): JSX.Element {
   const steerCount = useAtomValue(steerCountAtom);
   const followUpCount = useAtomValue(followUpCountAtom);
   const activeConfirmOverlay = useAtomValue(activeConfirmOverlayAtom);
-  const isPaletteOpen = useAtomValue(paletteOpenAtom);
-  const setIsPaletteOpen = useSetAtom(paletteOpenAtom);
-  
+
   const promptRef = useRef<PromptComposerHandle>(null);
 
   useEffect(() => {
     const cleanup = initializeEventListeners();
     return cleanup;
   }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent): void => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setIsPaletteOpen(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [setIsPaletteOpen]);
 
   const commands = createCommandRegistry({
     clearTimeline: () => clearTimeline(),
@@ -88,16 +71,16 @@ export function App(): JSX.Element {
 
   return (
     <ErrorBoundary>
-      <div className="app-shell">
-        <header className="app-header">
-          <div className="app-header-meta">
+      <div className="flex h-screen flex-col bg-background text-foreground">
+        <header className="flex items-center justify-between border-b px-4 py-3">
+          <div className="flex flex-col items-start gap-0.5 text-sm uppercase tracking-wide text-muted-foreground">
             <div>Pita · Phase 1 UI Shell</div>
-            <div className="app-header-shortcut-hint">⌘K / Ctrl+K</div>
+            <div className="text-xs normal-case tracking-normal text-muted-foreground/80">⌘K / Ctrl+K</div>
           </div>
-          <img src={logoSvg} alt="Pita logo" className="app-header-logo" />
+          <img src={logoSvg} alt="Pita logo" className="h-8 w-auto" />
         </header>
 
-        <main className="app-main">
+        <main className="flex-1 overflow-hidden">
           <TimelinePanel items={items} />
         </main>
 
@@ -115,11 +98,7 @@ export function App(): JSX.Element {
           onConfirmOverlayCancel={handleConfirmOverlayCancel}
         />
 
-        <CommandPalette
-          isOpen={isPaletteOpen}
-          commands={commands}
-          onClose={() => setIsPaletteOpen(false)}
-        />
+        <CommandPalette commands={commands} />
       </div>
     </ErrorBoundary>
   );
