@@ -101,8 +101,12 @@ Use this workflow when implementation happens in a separate Pi session.
 ### Quick command block (copy/paste template)
 
 ```bash
-# 1) Create isolated worktree
+# 0) Commit plan to main first (so it's available in worktree)
 cd /home/jbr/projects/pita
+git add docs/plans/<plan-file>.md
+git commit -m "docs: add <description> plan"
+
+# 1) Create isolated worktree
 git worktree add .worktrees/<worktree-name> -b <branch-name>
 
 # 2) Build one-line kickoff command and copy it to clipboard
@@ -112,6 +116,16 @@ EOF
 
 # 3) Verify clipboard, then paste in your shell to launch Pi directly
 wl-paste | sed -n '1,4p'
+```
+
+### 0) Commit plan to `main` first
+
+Before creating the worktree, commit the plan so it's available in the new worktree:
+
+```bash
+cd /home/jbr/projects/pita
+git add docs/plans/<plan-file>.md
+git commit -m "docs: add <description> plan"
 ```
 
 ### 1) Create isolated worktree from `main`
