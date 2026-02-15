@@ -10,6 +10,7 @@ interface UseSessionTimelineResult {
   addUserMessage: (text: string) => void;
   addSteerMessage: (text: string) => void;
   addQueueMessage: (text: string) => void;
+  clearTimeline: () => void;
 }
 
 const initialItems: TimelineItem[] = [];
@@ -66,6 +67,10 @@ export function useSessionTimeline(): UseSessionTimelineResult {
     ]);
   };
 
+  const clearTimeline = (): void => {
+    setItems([]);
+  };
+
   return {
     items,
     runState,
@@ -73,7 +78,8 @@ export function useSessionTimeline(): UseSessionTimelineResult {
     followUpCount,
     addUserMessage,
     addSteerMessage,
-    addQueueMessage
+    addQueueMessage,
+    clearTimeline
   };
 }
 
