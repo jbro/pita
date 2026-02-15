@@ -40,8 +40,8 @@ What it does:
 3. Verifies vertical-slice behavior:
    - `timeline-panel` and `prompt-composer-panel` are visible
    - preload session bridge is available (`window.pita.session.sendPrompt`)
-   - prompt input exists and send is callable
-   - timeline receives at least one runtime-driven update after send
+   - prompt input exists and `Ctrl+Enter` can submit
+   - timeline receives at least one runtime-driven update after submit
 
 ## Manual smoke checklist
 
@@ -55,14 +55,13 @@ Confirm:
 
 - App launches in dev mode.
 - Electron window opens.
-- Sending a prompt from the composer is possible.
+- Sending a prompt from the composer is possible via `Ctrl+Enter`.
 - Timeline updates while the runtime responds.
-- Abort control is visible while running.
-- Idle `Abort` button disabled state is expected; if abort is triggered via command/test path while idle, it is a safe no-op.
-- Button label changes from "Send" to "Steer" while running.
-- Pressing Enter while running triggers steer (not a new prompt).
-- Pressing Alt+Enter while running queues a follow-up.
-- Pending badge appears after steer or follow-up, shows separate steer and follow-up counts, and resets when idle.
+- Busy spinner appears while running.
+- Pressing Enter inserts a newline (idle and running).
+- Pressing `Ctrl+Enter` sends while idle and steers while running.
+- Pressing `Alt+Enter` sends while idle and queues follow-up while running.
+- Pressing `Esc` clears prompt while idle and aborts while running.
 - No console/runtime errors or preload/IPC exceptions appear while running the prompt lifecycle.
 - Confirm overlay request path (when triggered) replaces the composer UI with confirm/cancel actions.
 - After overlay resolution, normal composer input/actions are restored.
