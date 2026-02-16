@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { FolderGit2 } from "lucide-react";
 import { recentProjectsAtom, focusPanelAtom } from "../store/projectSelection";
@@ -11,6 +11,7 @@ interface RecentProjectsListProps {
 export function RecentProjectsList({ onOpen }: RecentProjectsListProps) {
   const projects = useAtomValue(recentProjectsAtom);
   const focusPanel = useAtomValue(focusPanelAtom);
+  const setFocusPanel = useSetAtom(focusPanelAtom);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const isFocused = focusPanel === "recent";
@@ -62,6 +63,7 @@ export function RecentProjectsList({ onOpen }: RecentProjectsListProps) {
           key={project.pathHash}
           type="button"
           onClick={() => {
+            setFocusPanel("recent");
             setSelectedIndex(index);
             onOpen(project.path);
           }}

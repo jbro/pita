@@ -10,24 +10,15 @@ declare global {
 export function App() {
   const [openedProject, setOpenedProject] = useState<string | null>(null);
 
-  const ipc = useMemo(
-    () =>
-      window.pita ?? {
-        app: {
-          getHomeDir: async () => "/tmp",
-        },
-        fs: {
-          listDirectory: async () => [],
-          createFolder: async () => {},
-          initProject: async () => {},
-        },
-        project: {
-          open: async () => {},
-          loadMru: async () => [],
-        },
-      },
-    [],
-  );
+  const ipc = useMemo(() => window.pita, []);
+
+  if (!ipc) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background text-destructive">
+        <p>IPC bridge unavailable. Restart the app.</p>
+      </div>
+    );
+  }
 
   if (openedProject) {
     return (

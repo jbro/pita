@@ -36,7 +36,6 @@ export function ProjectToolbar({ onNewFolder, onCreateProject, selectedIsRepo }:
       <button
         type="button"
         onClick={onNewFolder}
-        disabled={!millerFocused}
         className="flex items-center gap-1.5 rounded px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
       >
         <FolderPlus className="h-4 w-4" />
@@ -46,7 +45,7 @@ export function ProjectToolbar({ onNewFolder, onCreateProject, selectedIsRepo }:
       <button
         type="button"
         onClick={onCreateProject}
-        disabled={!millerFocused || selectedIsRepo}
+        disabled={selectedIsRepo}
         className="flex items-center gap-1.5 rounded px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
       >
         <GitBranchPlus className="h-4 w-4" />

@@ -43,7 +43,8 @@ describe("MillerColumnsView", () => {
   it("navigates into a folder on Right arrow", async () => {
     mockListDirectory
       .mockResolvedValueOnce([{ name: "projects", isDirectory: true, isGitRepo: false }])
-      .mockResolvedValueOnce([{ name: "my-app", isDirectory: true, isGitRepo: true }]);
+      .mockResolvedValueOnce([{ name: "my-app", isDirectory: true, isGitRepo: true }])
+      .mockResolvedValue([{ name: "my-app", isDirectory: true, isGitRepo: true }]);
 
     renderWithStore(
       <MillerColumnsView listDirectory={mockListDirectory} onOpenProject={vi.fn()} />,

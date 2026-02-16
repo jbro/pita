@@ -47,6 +47,8 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
   const [currentEntries, setCurrentEntries] = useState<DirectoryEntry[]>([]);
   const [newFolderPrompt, setNewFolderPrompt] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [millerRefreshTick, setMillerRefreshTick] = useState(0);
 
   useEffect(() => {
     ipc.project.loadMru().then(setRecentProjects).catch(() => setRecentProjects([]));
@@ -61,8 +63,14 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
     const currentDir = millerPath[millerPath.length - 1];
     ipc.fs
       .listDirectory(currentDir)
-      .then(setCurrentEntries)
-      .catch(() => setCurrentEntries([]));
+      .then((entries) => {
+        setCurrentEntries(entries);
+        setStatusMessage(null);
+      })
+      .catch(() => {
+        setCurrentEntries([]);
+        setStatusMessage(`Unable to read directory: ${currentDir}`);
+      });
   }, [millerPath, ipc]);
 
   useEffect(() => {
@@ -86,10 +94,10 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
   );
 
   const handleNewFolder = useCallback(() => {
-    if (focusPanel !== "miller") return;
+    setFocusPanel("miller");
     setNewFolderPrompt(true);
     setNewFolderName("");
-  }, [focusPanel]);
+  }, [setFocusPanel]);
 
   const currentDir = millerPath[millerPath.length - 1];
 
@@ -100,12 +108,12 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
     await ipc.fs.createFolder(currentDir, trimmed);
     setNewFolderPrompt(false);
     setNewFolderName("");
-    const refreshed = await ipc.fs.listDirectory(currentDir);
-    setCurrentEntries(refreshed);
+    setMillerRefreshTick((v) => v + 1);
+    setStatusMessage(`Folder created: ${trimmed}`);
   }, [newFolderName, ipc, currentDir]);
 
   const handleCreateProject = useCallback(async () => {
-    if (focusPanel !== "miller") return;
+    setFocusPanel("miller");
 
     const selectedEntry = currentEntries[millerSelection];
     if (selectedEntry && !selectedEntry.isDirectory) return;
@@ -115,9 +123,15 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
     const confirmed = window.confirm(`Create project in ${targetPath}?`);
     if (!confirmed) return;
 
-    await ipc.fs.initProject(targetPath);
-    await handleOpenProject(targetPath);
-  }, [focusPanel, currentEntries, millerSelection, currentDir, ipc, handleOpenProject]);
+    try {
+      await ipc.fs.initProject(targetPath);
+      setMillerRefreshTick((v) => v + 1);
+      await handleOpenProject(targetPath);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setStatusMessage(`Failed to create project: ${message}`);
+    }
+  }, [setFocusPanel, currentEntries, millerSelection, currentDir, ipc, handleOpenProject]);
 
   const selectedEntry = useMemo(() => currentEntries[millerSelection], [currentEntries, millerSelection]);
 
@@ -126,19 +140,31 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
       <div className="flex h-[min(860px,92vh)] w-full max-w-6xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl">
         <header className="shrink-0 border-b border-border px-5 py-4">
           <h1 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Open Project</h1>
+          {statusMessage && <p className="mt-2 text-xs text-muted-foreground">{statusMessage}</p>}
         </header>
 
         <div className="flex min-h-0 flex-1">
-          <section className="w-72 shrink-0 overflow-y-auto border-r border-border">
+          <section
+            className="w-72 shrink-0 overflow-y-auto border-r border-border"
+            onClick={() => setFocusPanel("recent")}
+          >
             <div className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Recent
             </div>
             <RecentProjectsList onOpen={handleOpenProject} />
           </section>
 
-          <section className="flex min-w-0 flex-1 flex-col">
+          <section
+            className="flex min-w-0 flex-1 flex-col"
+            onClick={() => setFocusPanel("miller")}
+          >
             <div className="min-h-0 flex-1">
-              <MillerColumnsView listDirectory={ipc.fs.listDirectory} onOpenProject={handleOpenProject} />
+              <MillerColumnsView
+                listDirectory={ipc.fs.listDirectory}
+                onOpenProject={handleOpenProject}
+                onInvalidOpen={setStatusMessage}
+                refreshTick={millerRefreshTick}
+              />
             </div>
 
             {newFolderPrompt && (

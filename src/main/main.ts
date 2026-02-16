@@ -13,7 +13,7 @@ function createMainWindow(): BrowserWindow {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
       preload: path.join(__dirname, "../preload/preload.cjs"),
     },
   });
@@ -30,14 +30,14 @@ function createMainWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  const isDev = !!process.env.VITE_DEV_SERVER_URL;
+  const useMemfs = process.env.PITA_USE_MEMFS === "1" || !!process.env.VITE_DEV_SERVER_URL;
 
   let fsImpl: any;
   let fsPromises: any;
   let pitaDir: string;
   let homedir: string;
 
-  if (isDev) {
+  if (useMemfs) {
     const vol = new Volume();
     seedDevFixtures(vol);
     fsImpl = vol;

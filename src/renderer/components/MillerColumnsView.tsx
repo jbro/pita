@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DirectoryEntry } from "@shared/types";
 import { MillerColumn } from "./MillerColumn";
@@ -13,16 +13,24 @@ import {
 interface MillerColumnsViewProps {
   listDirectory: (dirPath: string) => Promise<DirectoryEntry[]>;
   onOpenProject: (projectPath: string) => void;
+  onInvalidOpen?: (message: string) => void;
+  refreshTick?: number;
 }
 
 function joinPath(base: string, name: string): string {
   return `${base.replace(/\/+$/, "")}/${name}`;
 }
 
-export function MillerColumnsView({ listDirectory, onOpenProject }: MillerColumnsViewProps) {
+export function MillerColumnsView({
+  listDirectory,
+  onOpenProject,
+  onInvalidOpen,
+  refreshTick = 0,
+}: MillerColumnsViewProps) {
   const millerPath = useAtomValue(millerPathAtom);
   const [selection, setSelection] = useAtom(millerSelectionAtom);
   const focusPanel = useAtomValue(focusPanelAtom);
+  const setFocusPanel = useSetAtom(focusPanelAtom);
   const [, navigateInto] = useAtom(navigateIntoAtom);
   const [, navigateBack] = useAtom(navigateBackAtom);
 
@@ -60,6 +68,25 @@ export function MillerColumnsView({ listDirectory, onOpenProject }: MillerColumn
     scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
   }, [millerPath]);
 
+  useEffect(() => {
+    let cancelled = false;
+    listDirectory(currentDir)
+      .then((entries) => {
+        if (cancelled) return;
+        setColumnsData((prev) => new Map(prev).set(currentDir, entries));
+        setSelection((prev) => Math.max(0, Math.min(prev, entries.length - 1)));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setColumnsData((prev) => new Map(prev).set(currentDir, []));
+        setSelection(0);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshTick, currentDir, listDirectory, setSelection]);
+
   const handleNavigateInto = useCallback(
     (index: number) => {
       const entry = currentEntries[index];
@@ -93,8 +120,12 @@ export function MillerColumnsView({ listDirectory, onOpenProject }: MillerColumn
         case "Enter": {
           e.preventDefault();
           const entry = currentEntries[selection];
-          if (entry?.isGitRepo) {
+          if (!entry) break;
+
+          if (entry.isGitRepo) {
             onOpenProject(joinPath(currentDir, entry.name));
+          } else {
+            onInvalidOpen?.("Selected folder is not a git project. Use Create Project.");
           }
           break;
         }
@@ -127,9 +158,11 @@ export function MillerColumnsView({ listDirectory, onOpenProject }: MillerColumn
             selectedIndex={isActiveColumn ? selection : -1}
             isActive={isActiveColumn && isFocused}
             onSelect={(entryIndex) => {
+              setFocusPanel("miller");
               if (isActiveColumn) setSelection(entryIndex);
             }}
             onNavigate={(entryIndex) => {
+              setFocusPanel("miller");
               if (isActiveColumn) handleNavigateInto(entryIndex);
             }}
           />
