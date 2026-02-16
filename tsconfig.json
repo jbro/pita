@@ -21,8 +21,10 @@
     "src/shared",
     "src/main",
     "src/preload",
+    "tests",
     "vite.config.ts",
     "vite.main.config.ts",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "vitest.setup.ts"
   ]
 }
