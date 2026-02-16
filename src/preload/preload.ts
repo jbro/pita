@@ -3,6 +3,9 @@ import { IPC_CHANNELS } from "@shared/ipc";
 
 contextBridge.exposeInMainWorld("pita", {
   ping: (): Promise<string> => ipcRenderer.invoke(IPC_CHANNELS.ping),
+  app: {
+    getHomeDir: (): Promise<string> => ipcRenderer.invoke(IPC_CHANNELS.appGetHomeDir),
+  },
   fs: {
     listDirectory: (dirPath: string) => ipcRenderer.invoke(IPC_CHANNELS.fsListDirectory, dirPath),
     createFolder: (parentPath: string, name: string) =>

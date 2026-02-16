@@ -1,5 +1,6 @@
 export const IPC_CHANNELS = {
   ping: "app.ping",
+  appGetHomeDir: "app:getHomeDir",
   fsListDirectory: "fs:listDirectory",
   fsCreateFolder: "fs:createFolder",
   fsInitProject: "fs:initProject",

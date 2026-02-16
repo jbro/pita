@@ -4,12 +4,26 @@ import { App } from "../App";
 import { store } from "../store";
 
 describe("App", () => {
-  it("renders the project selection screen", () => {
+  it("renders the project selection screen", async () => {
+    window.pita = {
+      app: { getHomeDir: async () => "/home/dev" },
+      fs: {
+        listDirectory: async () => [],
+        createFolder: async () => {},
+        initProject: async () => {},
+      },
+      project: {
+        open: async () => {},
+        loadMru: async () => [],
+      },
+    };
+
     render(
       <Provider store={store}>
         <App />
       </Provider>
     );
-    expect(screen.getByText("Open Project")).toBeInTheDocument();
+
+    expect(await screen.findByText("Open Project")).toBeInTheDocument();
   });
 });

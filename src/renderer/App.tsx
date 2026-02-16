@@ -13,6 +13,9 @@ export function App() {
   const ipc = useMemo(
     () =>
       window.pita ?? {
+        app: {
+          getHomeDir: async () => "/tmp",
+        },
         fs: {
           listDirectory: async () => [],
           createFolder: async () => {},

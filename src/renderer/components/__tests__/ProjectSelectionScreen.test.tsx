@@ -4,6 +4,9 @@ import { ProjectSelectionScreen } from "../ProjectSelectionScreen";
 import { focusPanelAtom, millerHomeDirAtom } from "../../store/projectSelection";
 
 const mockIpc = {
+  app: {
+    getHomeDir: vi.fn().mockResolvedValue("/home/dev"),
+  },
   fs: {
     listDirectory: vi.fn().mockResolvedValue([
       { name: "my-repo", isDirectory: true, isGitRepo: true },

@@ -35,22 +35,26 @@ app.whenReady().then(() => {
   let fsImpl: any;
   let fsPromises: any;
   let pitaDir: string;
+  let homedir: string;
 
   if (isDev) {
     const vol = new Volume();
     seedDevFixtures(vol);
     fsImpl = vol;
     fsPromises = vol.promises;
-    pitaDir = "/home/dev/.pita";
+    homedir = "/home/dev";
+    pitaDir = `${homedir}/.pita`;
   } else {
+    homedir = process.env.HOME || "/tmp";
     fsImpl = fs;
     fsPromises = fs.promises;
-    pitaDir = path.join(process.env.HOME || "/tmp", ".pita");
+    pitaDir = path.join(homedir, ".pita");
   }
 
   const handlers = createProjectSelectionHandlers(fsImpl, fsPromises, pitaDir);
 
   ipcMain.handle(IPC_CHANNELS.ping, () => "pong");
+  ipcMain.handle(IPC_CHANNELS.appGetHomeDir, () => homedir);
   ipcMain.handle(IPC_CHANNELS.fsListDirectory, (_, dirPath) => handlers.fsListDirectory(dirPath));
   ipcMain.handle(IPC_CHANNELS.fsCreateFolder, (_, parentPath, name) =>
     handlers.fsCreateFolder(parentPath, name),

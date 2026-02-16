@@ -7,12 +7,16 @@ import { ProjectToolbar } from "./ProjectToolbar";
 import { ShortcutHelpBar } from "./ShortcutHelpBar";
 import {
   focusPanelAtom,
+  millerHomeDirAtom,
   millerPathAtom,
   millerSelectionAtom,
   recentProjectsAtom,
 } from "../store/projectSelection";
 
 interface ProjectSelectionIpc {
+  app?: {
+    getHomeDir: () => Promise<string>;
+  };
   fs: {
     listDirectory: (dirPath: string) => Promise<DirectoryEntry[]>;
     createFolder: (parentPath: string, name: string) => Promise<void>;
@@ -36,6 +40,7 @@ function joinPath(base: string, name: string): string {
 export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectionScreenProps) {
   const [focusPanel, setFocusPanel] = useAtom(focusPanelAtom);
   const setRecentProjects = useSetAtom(recentProjectsAtom);
+  const setMillerHomeDir = useSetAtom(millerHomeDirAtom);
   const millerPath = useAtomValue(millerPathAtom);
   const millerSelection = useAtomValue(millerSelectionAtom);
 
@@ -44,12 +49,20 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
   const [newFolderName, setNewFolderName] = useState("");
 
   useEffect(() => {
-    ipc.project.loadMru().then(setRecentProjects);
+    ipc.project.loadMru().then(setRecentProjects).catch(() => setRecentProjects([]));
   }, [ipc, setRecentProjects]);
 
   useEffect(() => {
+    if (!ipc.app?.getHomeDir) return;
+    ipc.app.getHomeDir().then(setMillerHomeDir).catch(() => undefined);
+  }, [ipc, setMillerHomeDir]);
+
+  useEffect(() => {
     const currentDir = millerPath[millerPath.length - 1];
-    ipc.fs.listDirectory(currentDir).then(setCurrentEntries);
+    ipc.fs
+      .listDirectory(currentDir)
+      .then(setCurrentEntries)
+      .catch(() => setCurrentEntries([]));
   }, [millerPath, ipc]);
 
   useEffect(() => {
@@ -109,51 +122,53 @@ export function ProjectSelectionScreen({ ipc, onProjectOpened }: ProjectSelectio
   const selectedEntry = useMemo(() => currentEntries[millerSelection], [currentEntries, millerSelection]);
 
   return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
-      <header className="shrink-0 border-b border-border px-4 py-3">
-        <h1 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Open Project</h1>
-      </header>
+    <div className="flex h-screen items-center justify-center bg-background p-6 text-foreground">
+      <div className="flex h-[min(860px,92vh)] w-full max-w-6xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+        <header className="shrink-0 border-b border-border px-5 py-4">
+          <h1 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Open Project</h1>
+        </header>
 
-      <div className="flex min-h-0 flex-1">
-        <section className="w-72 shrink-0 overflow-y-auto border-r border-border">
-          <div className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Recent
-          </div>
-          <RecentProjectsList onOpen={handleOpenProject} />
-        </section>
-
-        <section className="flex min-w-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1">
-            <MillerColumnsView listDirectory={ipc.fs.listDirectory} onOpenProject={handleOpenProject} />
-          </div>
-
-          {newFolderPrompt && (
-            <div className="flex items-center gap-2 border-t border-border px-4 py-2">
-              <span className="text-sm text-muted-foreground">Folder name:</span>
-              <input
-                autoFocus
-                value={newFolderName}
-                onChange={(e) => setNewFolderName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") void handleNewFolderConfirm();
-                  if (e.key === "Escape") {
-                    setNewFolderPrompt(false);
-                    setNewFolderName("");
-                  }
-                }}
-                className="flex-1 rounded bg-input px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-ring"
-              />
+        <div className="flex min-h-0 flex-1">
+          <section className="w-72 shrink-0 overflow-y-auto border-r border-border">
+            <div className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Recent
             </div>
-          )}
-        </section>
-      </div>
+            <RecentProjectsList onOpen={handleOpenProject} />
+          </section>
 
-      <ProjectToolbar
-        onNewFolder={handleNewFolder}
-        onCreateProject={handleCreateProject}
-        selectedIsRepo={selectedEntry?.isGitRepo ?? false}
-      />
-      <ShortcutHelpBar />
+          <section className="flex min-w-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1">
+              <MillerColumnsView listDirectory={ipc.fs.listDirectory} onOpenProject={handleOpenProject} />
+            </div>
+
+            {newFolderPrompt && (
+              <div className="flex items-center gap-2 border-t border-border px-4 py-2">
+                <span className="text-sm text-muted-foreground">Folder name:</span>
+                <input
+                  autoFocus
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") void handleNewFolderConfirm();
+                    if (e.key === "Escape") {
+                      setNewFolderPrompt(false);
+                      setNewFolderName("");
+                    }
+                  }}
+                  className="flex-1 rounded bg-input px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-ring"
+                />
+              </div>
+            )}
+          </section>
+        </div>
+
+        <ProjectToolbar
+          onNewFolder={handleNewFolder}
+          onCreateProject={handleCreateProject}
+          selectedIsRepo={selectedEntry?.isGitRepo ?? false}
+        />
+        <ShortcutHelpBar />
+      </div>
     </div>
   );
 }
