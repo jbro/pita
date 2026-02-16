@@ -19,6 +19,16 @@ export function seedDevFixtures(vol: Volume): void {
     "/home/dev/work/client-a/.git/HEAD": "ref: refs/heads/main",
     "/home/dev/work/client-a/package.json": "{}",
     "/home/dev/work/ideas/brainstorm.md": "# Ideas",
+
+    // Deeply nested tree for navigation tests
+    "/home/dev/deep/level-1/note.txt": "l1",
+    "/home/dev/deep/level-1/level-2/note.txt": "l2",
+    "/home/dev/deep/level-1/level-2/level-3/note.txt": "l3",
+    "/home/dev/deep/level-1/level-2/level-3/level-4/note.txt": "l4",
+    "/home/dev/deep/level-1/level-2/level-3/level-4/level-5/note.txt": "l5",
+    "/home/dev/deep/level-1/level-2/level-3/level-4/level-5/level-6/.git/HEAD": "ref: refs/heads/main",
+    "/home/dev/deep/level-1/side-a/readme.md": "side-a",
+    "/home/dev/deep/level-1/level-2/side-b/readme.md": "side-b",
   };
 
   const mru: MruStore = {
