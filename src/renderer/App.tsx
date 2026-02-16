@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ProjectSelectionScreen } from "./components/ProjectSelectionScreen";
 
 declare global {
@@ -9,15 +9,22 @@ declare global {
 
 export function App() {
   const [openedProject, setOpenedProject] = useState<string | null>(null);
-  const ipc = window.pita;
 
-  if (!ipc) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background text-foreground">
-        <h1 className="text-2xl font-bold">Pita</h1>
-      </div>
-    );
-  }
+  const ipc = useMemo(
+    () =>
+      window.pita ?? {
+        fs: {
+          listDirectory: async () => [],
+          createFolder: async () => {},
+          initProject: async () => {},
+        },
+        project: {
+          open: async () => {},
+          loadMru: async () => [],
+        },
+      },
+    [],
+  );
 
   if (openedProject) {
     return (
