@@ -11,7 +11,7 @@ Features are specified as user stories before implementation. One file per story
 
 | Story | Status |
 |---|---|
-| [US-1: Project Selection on Launch](user-stories/us-1-project-selection.md) | todo |
+| [US-1: Project Selection on Launch](user-stories/us-1-project-selection.md) | done |
 | [US-2: Prompt Composer and Session Interaction](user-stories/us-2-prompt-composer.md) | todo |
 | [US-3: Command Palette](user-stories/us-3-command-palette.md) | todo |
 | [US-4: Multi-Session Navigation and Creation](user-stories/us-4-multi-session.md) | todo |

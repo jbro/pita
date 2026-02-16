@@ -146,9 +146,9 @@ Agent emits AgentEvent
 
 A thin typed wrapper over Electron IPC. `src/shared/ipc.ts` defines channel names and payload types; both main and renderer import it (enabled by the unified Vite build).
 
-**Commands (renderer → main):** `createSession`, `sendPrompt`, `steer`, `followUp`, `abort`, `clearQueue`, `switchSession`, `listSessions`, `destroySession`.
+**Currently implemented commands (renderer → main):** `app.ping`, `fs:listDirectory`, `fs:createFolder`, `fs:initProject`, `project:open`, `project:loadMru`.
 
-**Events (main → renderer):** streamed via `webContents.send`, tagged with session ID, filtered in the Jotai store.
+Project-selection calls are handled in `src/main/ipc/projectSelectionIpc.ts` and exposed in `window.pita` via `src/preload/preload.ts`.
 
 ## Dependency Injection
 

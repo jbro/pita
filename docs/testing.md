@@ -10,7 +10,7 @@ User stories drive development through TDD/BDD. Write tests before implementatio
 |---|---|---|---|
 | Unit | Vitest | Pure logic, state, stores | Mock `StreamFn`, `memfs` |
 | DOM integration | Vitest + jsdom | React components, Jotai atoms, interaction | Mock `StreamFn`, `memfs`, mock IPC bridge |
-| E2E | Playwright | Full Electron app | Mock `StreamFn` (injected via env/config), real temp dirs |
+| E2E | Playwright | Full Electron app smoke checks for project-selection shell | Real Electron build artifacts (`dist/`) |
 
 ## Mock Model Provider
 
