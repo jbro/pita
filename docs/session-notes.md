@@ -100,6 +100,16 @@ Executed `docs/plans/2026-02-16-project-init.md`. Scaffolded the full techstack 
 
 **Final state:** all three gates pass (typecheck, vitest 1 test, playwright 1 test). `bun run dev` launches the Electron app with Vite HMR.
 
+### Session 7 — US-1 Stabilization and Test Strategy
+
+**Decisions and outcomes:**
+- Project selection now resolves home directory from runtime (`app:getHomeDir`) instead of hardcoded renderer defaults.
+- Dev fixture filesystem can be forced with `PITA_USE_MEMFS=1` for reproducible debugging and E2E.
+- Project selection UI moved into a centered panel/card instead of full-window edge-to-edge layout.
+- Added status messaging for invalid open attempts (non-git folder) and folder creation feedback.
+- Testing workflow confirmed: iterate behavior quickly in DOM tests first, then verify integration in Playwright.
+- Added deeper nested-directory navigation coverage in both DOM and E2E test suites.
+
 ### Session 4 — Workflow Review
 
 **Decisions:**

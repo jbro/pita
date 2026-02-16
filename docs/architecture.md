@@ -146,9 +146,22 @@ Agent emits AgentEvent
 
 A thin typed wrapper over Electron IPC. `src/shared/ipc.ts` defines channel names and payload types; both main and renderer import it (enabled by the unified Vite build).
 
-**Currently implemented commands (renderer → main):** `app.ping`, `fs:listDirectory`, `fs:createFolder`, `fs:initProject`, `project:open`, `project:loadMru`.
+**Currently implemented commands (renderer → main):**
+- `app.ping`
+- `app:getHomeDir`
+- `fs:listDirectory`
+- `fs:createFolder`
+- `fs:initProject`
+- `project:open`
+- `project:loadMru`
 
 Project-selection calls are handled in `src/main/ipc/projectSelectionIpc.ts` and exposed in `window.pita` via `src/preload/preload.ts`.
+
+### Runtime filesystem mode
+
+- Production/default: main process uses real `node:fs` and real home directory.
+- Dev/fixture mode: main process uses one shared memfs volume seeded from `src/main/dev/fixtures.ts`.
+- Enable fixture mode with `VITE_DEV_SERVER_URL` (dev flow) or explicit `PITA_USE_MEMFS=1` (tests/debugging).
 
 ## Dependency Injection
 
