@@ -22,6 +22,24 @@
 
 The renderer never touches the filesystem or agent. It sends commands and receives events over IPC.
 
+## Source Layout
+
+```
+src/
+  main/           # Electron main process (Node.js)
+    main.ts       # App entry, window lifecycle, IPC handlers
+  preload/        # Electron preload (sandboxed bridge)
+    preload.ts    # contextBridge exposing typed IPC to renderer
+  renderer/       # React app (browser)
+    main.tsx      # React entry
+    App.tsx       # Root component
+    store/        # Jotai store
+    lib/          # Utilities (cn, etc.)
+    styles.css    # Tailwind base + CSS variables
+  shared/         # Imported by both main and renderer
+    ipc.ts        # Channel names and payload types
+```
+
 ## One Instance Per Project
 
 Each project may be opened by one Pita instance at a time. A lockfile at `~/.pita/projects/<project-path-hash>/lock` enforces this. Stale locks from crashes are cleaned up on startup.

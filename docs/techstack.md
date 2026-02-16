@@ -21,6 +21,8 @@
 ## Build & Tooling
 
 - **Vite** — builds both renderer and main process
+  - Renderer: standard Vite + React plugin (`vite.config.ts`)
+  - Main + preload: Vite SSR mode, CJS output with `.cjs` extension (`vite.main.config.ts`) — required because `package.json` has `"type": "module"`
 - **Bun** — package manager and task runner
 
 ## Git

@@ -88,6 +88,18 @@ Everything in `.worktrees/prototype/` is reference-only — it will be thrown aw
 - Three DI seams: StreamFn, fs, IPC bridge — all constructor/factory params
 - See `docs/architecture.md` for full details
 
+### Session 6 — Project Initialization
+
+Executed `docs/plans/2026-02-16-project-init.md`. Scaffolded the full techstack from a clean repo.
+
+**Issues encountered and resolved:**
+- React 19 types dropped global `JSX` namespace — use inferred return types instead
+- `@testing-library/jest-dom` needs an explicit `vitest.setup.ts` importing `@testing-library/jest-dom/vitest`
+- `"type": "module"` in package.json conflicts with CJS output — main/preload output uses `.cjs` extension
+- `tsconfig.json` must include `tests/` and `vitest.setup.ts` for type checking
+
+**Final state:** all three gates pass (typecheck, vitest 1 test, playwright 1 test). `bun run dev` launches the Electron app with Vite HMR.
+
 ### Session 4 — Workflow Review
 
 **Decisions:**

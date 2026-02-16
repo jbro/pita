@@ -15,6 +15,14 @@ bun install
 bun run dev
 ```
 
+## Verification
+
+```bash
+bun run typecheck    # TypeScript check (all code)
+bun run test         # Vitest unit/integration tests
+bun run test:e2e     # Playwright Electron smoke tests (builds first)
+```
+
 ## Documentation
 
 - [docs/techstack.md](docs/techstack.md) — technology choices
