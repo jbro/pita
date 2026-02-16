@@ -1,8 +1,10 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import fs from "node:fs";
+import { Volume } from "memfs";
 import { IPC_CHANNELS } from "@shared/ipc";
 import { createProjectSelectionHandlers } from "./ipc/projectSelectionIpc";
+import { seedDevFixtures } from "./dev/fixtures";
 
 function createMainWindow(): BrowserWindow {
   const window = new BrowserWindow({
@@ -28,8 +30,25 @@ function createMainWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  const pitaDir = path.join(process.env.HOME || "/tmp", ".pita");
-  const handlers = createProjectSelectionHandlers(fs, fs.promises as any, pitaDir);
+  const isDev = !!process.env.VITE_DEV_SERVER_URL;
+
+  let fsImpl: any;
+  let fsPromises: any;
+  let pitaDir: string;
+
+  if (isDev) {
+    const vol = new Volume();
+    seedDevFixtures(vol);
+    fsImpl = vol;
+    fsPromises = vol.promises;
+    pitaDir = "/home/dev/.pita";
+  } else {
+    fsImpl = fs;
+    fsPromises = fs.promises;
+    pitaDir = path.join(process.env.HOME || "/tmp", ".pita");
+  }
+
+  const handlers = createProjectSelectionHandlers(fsImpl, fsPromises, pitaDir);
 
   ipcMain.handle(IPC_CHANNELS.ping, () => "pong");
   ipcMain.handle(IPC_CHANNELS.fsListDirectory, (_, dirPath) => handlers.fsListDirectory(dirPath));
