@@ -15,11 +15,25 @@ Use these upstream locations as the primary reference:
 Local clone for fast inspection:
 - `~/tmp/pi-mono`
 
+## Project Docs
+
+**`/skill:project-docs`** — Use this at session start and mid-session.
+
+- Reads all docs in `docs/` directory
+- Provides summary to orient you
+- Load at **session start** for baseline context
+- Load mid-session when **nearing token limits** to refine and compress
+
 ## Session Handoff Checklist
 
 When starting a new planning or implementation session:
 
-1. Read `README.md`, `docs/techstack.md`, `docs/architecture.md`, and `docs/workflow.md` first.
+1. Load `/skill:project-docs` to get a summary of all docs.
+2. **If planning a new feature:** Load `/skill:brainstorming` to explore requirements, design, and risks before committing to code.
+3. Refer to source docs in `docs/` for detailed information:
+   - `docs/architecture.md` — system design, IPC, storage
+   - `docs/testing.md` — test strategy, mocking, fixtures
+   - `docs/workflow.md` — git patterns, phase gates, handoff procedures
 
 ## Workflow Compliance (Mandatory)
 
@@ -32,22 +46,54 @@ Required behavior:
 3. After delegated/parallel implementation reports completion, run the documented phase-end gates process before integration.
 4. Only merge to `main` and clean up worktree/branch after gate results are reviewed and accepted.
 5. After each sub-session review, automatically copy the follow-up feedback prompt to the clipboard via detached `wl-copy` (no extra user confirmation needed).
-6. When implementation is approved, copy a follow-up prompt that instructs the sub-session to run `/refine-docs`, commit any resulting updates, and report back.
-7. Merge to `main` and clean up worktree/branch only after the `/refine-docs` completion report and commit(s) are reviewed and accepted.
+6. When implementation is approved, copy a follow-up prompt that instructs the sub-session to:
+   - Run `/skill:project-docs` with refine request (update `docs/`)
+   - Commit doc updates with `git commit -m "docs: refine <topic>"`
+   - Report completion and commit SHA
+7. Review the `/refine-docs` commit(s) carefully — docs are the contract for future sessions.
+8. Merge to `main` and clean up worktree/branch only after doc updates are reviewed and accepted.
 
 If instructions from memory conflict with `docs/workflow.md`, follow the document and call out the difference explicitly.
+
+## Context Management (Mid-Session Doc Refinement)
+
+When a session is nearing token limit or context exhaustion:
+
+1. **Recognize the signal:** You're running low on tokens, or the user asks for `/refine-docs`.
+2. **Load `/skill:project-docs`** and follow the "Refine Docs" steps:
+   - Review what was learned or changed in this session
+   - Identify which docs should be updated
+   - Draft edits (prefer small, surgical updates)
+   - **Propose before applying** — wait for user approval
+   - Apply changes and report what was updated
+3. **Why this matters:** Compressed, up-to-date docs mean the next session loads fresher context and uses fewer tokens.
+4. **Before writing docs, load `/skill:writing-clearly-and-concisely`** to ensure quality.
+
+This is especially valuable during:
+- Feature implementation (capture design decisions, patterns discovered)
+- Debugging sessions (document root causes, workarounds)
+- Architecture changes (update `docs/architecture.md`)
+- Test strategy updates (refine `docs/testing.md`)
 
 ## Feature Development Flow
 
 Every feature follows this sequence:
 
-1. **User story** — define the feature in `docs/user-stories.md` before any code.
-2. **Tests first (TDD/BDD)** — write unit, DOM integration, and/or E2E tests that capture the expected behaviour.
-3. **Implementation** — write the minimum code to make the tests pass.
-4. **Phase-end gates** — run `bun run typecheck`, `bun run test`, `bun run test:e2e`. All must pass.
-5. **Doc refinement** — run `/refine-docs` and commit any updates.
+1. **Brainstorm** — Load `/skill:brainstorming` to explore:
+   - What are we solving? Why?
+   - User needs and acceptance criteria
+   - Design options and tradeoffs
+   - Architecture impact and risks
+2. **User story** — Write the feature in `docs/user-stories.md`, capturing brainstorm outcomes.
+3. **Tests first (TDD/BDD)** — Write unit, DOM integration, and/or E2E tests that capture the expected behaviour.
+4. **Implementation** — Write the minimum code to make the tests pass.
+5. **Phase-end gates** — Run `bun run typecheck`, `bun run test`, `bun run test:e2e`. All must pass.
+6. **Doc refinement** — Run `/skill:project-docs` with refine request:
+   - Update `docs/architecture.md`, `docs/testing.md`, or other relevant docs
+   - Commit with `git commit -m "docs: refine <topic> after feature"`
+7. **Merge to main** — Only after all gates pass and docs are updated.
 
-Do not skip steps. If a user story doesn't exist yet, write one and get confirmation before proceeding.
+Do not skip steps. Brainstorming before a user story prevents rework and clarifies scope.
 
 ## Documentation Placement Preferences
 
@@ -59,7 +105,10 @@ Do not skip steps. If a user story doesn't exist yet, write one and get confirma
 
 At the start of every new or resumed session, before proposing implementation work:
 
-1. Re-read `README.md`, `docs/techstack.md`, `docs/architecture.md`, and `docs/workflow.md`.
+1. **Load `/skill:project-docs`** and run the "Build Context" steps:
+   - Read all docs in `docs/`
+   - Summarize what you learned in 2–3 sentences
+   - Ask user to confirm or correct understanding
 2. Inspect recent project activity (e.g., changed files, recent commits, open plan docs) to infer what is in progress.
 3. Summarize the inferred current objective, what is done, and what is still open.
 4. Recommend the best next actions (ordered, concrete, and minimal).
