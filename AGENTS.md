@@ -15,14 +15,20 @@ Use these upstream locations as the primary reference:
 Local clone for fast inspection:
 - `~/tmp/pi-mono`
 
-## Project Docs
+## Session Reestablishment Protocol (Always Do First)
 
-**`/skill:project-docs`** — Use this at session start and mid-session.
+At the start of every new or resumed session, before proposing implementation work:
 
-- Reads all docs in `docs/` directory
-- Provides summary to orient you
-- Load at **session start** for baseline context
-- Load mid-session when **nearing token limits** to refine and compress
+1. **Load `/skill:project-docs`** and run the "Build Context" steps:
+   - Read all docs in `docs/`
+   - Summarize what you learned in 2–3 sentences
+   - Ask user to confirm or correct understanding
+2. Inspect recent project activity (e.g., changed files, recent commits, open plan docs) to infer what is in progress.
+3. Summarize the inferred current objective, what is done, and what is still open.
+4. Recommend the best next actions (ordered, concrete, and minimal).
+5. If context is still ambiguous, ask one focused clarification question before proceeding.
+
+This reestablishment step is mandatory and precedes planning, coding, or verification actions.
 
 ## Session Handoff Checklist
 
@@ -35,6 +41,16 @@ When starting a new planning or implementation session:
    - `docs/testing.md` — test strategy, mocking, fixtures
    - `docs/workflow.md` — git patterns, phase gates, handoff procedures
 
+## Project-Docs Loading Exclusions
+
+When running the "Build Context" steps, skip these paths:
+
+- `docs/plans/` — implementation plans; load individual files on demand
+- `docs/session-notes.md` — historical session log; decisions are in the authoritative docs
+- `docs/user-stories/*.md` — individual story files; load on demand per feature; the index (`docs/user-stories.md`) is sufficient
+
+These paths remain valid **write targets** during `/refine-docs`.
+
 ## Workflow Compliance (Mandatory)
 
 Before proposing execution mechanics (worktrees, session handoff, clipboard prompts, phase-end gates, merge/cleanup), read and follow `docs/workflow.md`.
@@ -45,7 +61,7 @@ Required behavior:
 2. Use the documented parallel-session handoff steps when applicable, preferring the one-line kickoff command flow (directory change + `pi` launch with initial prompt) copied via detached `wl-copy`.
 3. After delegated/parallel implementation reports completion, run the documented phase-end gates process before integration.
 4. Only merge to `main` and clean up worktree/branch after gate results are reviewed and accepted.
-5. After each sub-session review, automatically copy the follow-up feedback prompt to the clipboard via detached `wl-copy` (no extra user confirmation needed).
+5. After each sub-session review, copy a follow-up feedback prompt to the clipboard via `wl-copy` (automatic, no user confirmation needed). Use the feedback prompt templates in **docs/workflow.md** step 4.
 6. When implementation is approved, copy a follow-up prompt that instructs the sub-session to:
    - Run `/skill:project-docs` with refine request (update `docs/`)
    - Commit doc updates with `git commit -m "docs: refine <topic>"`
@@ -57,7 +73,7 @@ If instructions from memory conflict with `docs/workflow.md`, follow the documen
 
 ## Context Management (Mid-Session Doc Refinement)
 
-When a session is nearing token limit or context exhaustion:
+When a session is nearing token limit or context exhaustion (guideline: when **<60K tokens remain** in the context budget):
 
 1. **Recognize the signal:** You're running low on tokens, or the user asks for `/refine-docs`.
 2. **Load `/skill:project-docs`** and follow the "Refine Docs" steps:
@@ -69,11 +85,23 @@ When a session is nearing token limit or context exhaustion:
 3. **Why this matters:** Compressed, up-to-date docs mean the next session loads fresher context and uses fewer tokens.
 4. **Before writing docs, load `/skill:writing-clearly-and-concisely`** to ensure quality.
 
-This is especially valuable during:
-- Feature implementation (capture design decisions, patterns discovered)
-- Debugging sessions (document root causes, workarounds)
-- Architecture changes (update `docs/architecture.md`)
-- Test strategy updates (refine `docs/testing.md`)
+### Refinement targets
+
+| Change type | Update |
+|---|---|
+| Architecture | `docs/architecture.md` |
+| Test strategy | `docs/testing.md` |
+| Workflow / process | `docs/workflow.md` |
+| New feature | `docs/user-stories.md` + story file |
+| Session decisions | `docs/session-notes.md` |
+
+### Principles
+
+1. Docs are contracts — stale docs waste tokens re-learning.
+2. Prefer small, surgical updates over rewrites.
+3. Propose before applying — always wait for user approval.
+4. Don't duplicate what the code already makes obvious.
+5. Load `/skill:writing-clearly-and-concisely` before major updates.
 
 ## Feature Development Flow
 
@@ -100,20 +128,5 @@ Do not skip steps. Brainstorming before a user story prevents rework and clarifi
 - Keep `README.md` concise (quick intro, setup, and doc links).
 - Keep core guarantees and phase/status detail in `docs/overview.md` (and deeper docs), not in `README.md`.
 - When updating documentation, preserve this split unless the user asks otherwise.
-
-## Session Reestablishment Protocol (Always Do First)
-
-At the start of every new or resumed session, before proposing implementation work:
-
-1. **Load `/skill:project-docs`** and run the "Build Context" steps:
-   - Read all docs in `docs/`
-   - Summarize what you learned in 2–3 sentences
-   - Ask user to confirm or correct understanding
-2. Inspect recent project activity (e.g., changed files, recent commits, open plan docs) to infer what is in progress.
-3. Summarize the inferred current objective, what is done, and what is still open.
-4. Recommend the best next actions (ordered, concrete, and minimal).
-5. If context is still ambiguous, ask one focused clarification question before proceeding.
-
-This reestablishment step is mandatory and precedes planning, coding, or verification actions.
 
 > **Do not edit this file without explicit user permission.**

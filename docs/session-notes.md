@@ -71,6 +71,14 @@ Everything in `.worktrees/prototype/` is reference-only — it will be thrown aw
 - Code must be structured for dependency injection: `fs` and stream function are params, not hardcoded imports
 - See `docs/testing.md` for full details
 
+### Session 4 — Workflow Review
+
+**Decisions:**
+- `docs/workflow.md` is now development-only (how we build Pita)
+- Stripped all product-level concerns (worker commands, lock files, foreground slot, error recovery)
+- Product worktree/session model will be revisited in a future architecture session
+- Simplified phase-end gates to just `typecheck`, `test`, `test:e2e`
+
 ### Session 5 — Architecture
 
 **Decisions:**
@@ -109,11 +117,3 @@ Executed `docs/plans/2026-02-16-project-init.md`. Scaffolded the full techstack 
 - Added status messaging for invalid open attempts (non-git folder) and folder creation feedback.
 - Testing workflow confirmed: iterate behavior quickly in DOM tests first, then verify integration in Playwright.
 - Added deeper nested-directory navigation coverage in both DOM and E2E test suites.
-
-### Session 4 — Workflow Review
-
-**Decisions:**
-- `docs/workflow.md` is now development-only (how we build Pita)
-- Stripped all product-level concerns (worker commands, lock files, foreground slot, error recovery)
-- Product worktree/session model will be revisited in a future architecture session
-- Simplified phase-end gates to just `typecheck`, `test`, `test:e2e`

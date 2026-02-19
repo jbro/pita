@@ -60,6 +60,8 @@ Use this workflow when implementation happens in a separate Pi session.
 
 ### Quick command block (copy/paste template)
 
+> Compressed version of steps 0–3 below. The numbered sections add context; the bash is identical.
+
 ```bash
 # 0) Commit plan to main first (so it's available in worktree)
 cd /home/jbr/projects/pita
@@ -119,7 +121,22 @@ When the implementation session reports completion, prepare the next **feedback 
 
 Rule: after every review response (approve/fix/next batch), copy the exact follow-up prompt to clipboard by default.
 
-When implementation is approved, copy a follow-up prompt that tells the sub-session to run `/refine-docs`, commit any resulting doc updates, and report back.
+**Feedback prompt — mid-review (fix or next batch):**
+```
+<feedback here: approve / request fixes / next batch>
+
+[If fixing:] Please address: <specific issues>
+
+After completing, report exact verification output, then stop with: "Ready for feedback."
+```
+
+**Feedback prompt — when implementation is approved:**
+```
+Implementation approved. Please:
+1. Run /skill:project-docs and refine docs based on what we implemented.
+2. Commit: git commit -m "docs: refine <topic>"
+3. Report completion and commit SHA.
+```
 
 Only after that `/refine-docs` completion report is reviewed and accepted, proceed to merge and cleanup.
 

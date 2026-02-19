@@ -146,7 +146,7 @@ Agent emits AgentEvent
 
 A thin typed wrapper over Electron IPC. `src/shared/ipc.ts` defines channel names and payload types; both main and renderer import it (enabled by the unified Vite build).
 
-**Currently implemented commands (renderer → main):**
+**Currently implemented commands (renderer → main)** — see `src/shared/ipc.ts` for the authoritative list; this may lag:
 - `app.ping`
 - `app:getHomeDir`
 - `fs:listDirectory`
