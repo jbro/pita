@@ -58,28 +58,6 @@ For agent-specific session handoff guidance, see `AGENTS.md`.
 
 Use this workflow when implementation happens in a separate Pi session.
 
-### Quick command block (copy/paste template)
-
-> Compressed version of steps 0–3 below. The numbered sections add context; the bash is identical.
-
-```bash
-# 0) Commit plan to main first (so it's available in worktree)
-cd /home/jbr/projects/pita
-git add docs/plans/<plan-file>.md
-git commit -m "docs: add <description> plan"
-
-# 1) Create isolated worktree
-git worktree add .worktrees/<worktree-name> -b <branch-name>
-
-# 2) Build one-line kickoff command and copy it to clipboard
-cat <<'EOF' | nohup wl-copy >/tmp/wl-copy-nohup.log 2>&1 &
-cd /home/jbr/projects/pita/.worktrees/<worktree-name> && $HOME/node_modules/.bin/pi $'I\'m using the executing-plans skill to implement this plan.\n\nPlan file:\ndocs/plans/<plan-file>.md\n\nConstraint:\n- ONLY work inside this assigned worktree.\n- Do not modify files outside this worktree.\n\nPlease:\n1) review the plan critically and raise any concerns first,\n2) execute the first batch (default first 3 tasks),\n3) report exact verification output,\n4) stop for feedback with: "Ready for feedback."'
-EOF
-
-# 3) Verify clipboard, then paste in your shell to launch Pi directly
-wl-paste | sed -n '1,4p'
-```
-
 ### 0) Commit plan to `main` first
 
 Before creating the worktree, commit the plan so it's available in the new worktree:

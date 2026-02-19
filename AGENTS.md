@@ -2,44 +2,32 @@
 
 # AGENTS
 
-This file contains agent-specific operating guidance for this repository.
+Agent-specific operating guidance for this repository.
 
 ## Source References
-
-Use these upstream locations as the primary reference:
 
 - Monorepo root: `https://github.com/badlogic/pi-mono/tree/main`
 - Coding agent package: `https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent`
 - SDK docs: `https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent/docs/sdk.md`
 
-Local clone for fast inspection:
-- `~/tmp/pi-mono`
+Local clone for fast inspection: `~/tmp/pi-mono`
 
-## Session Reestablishment Protocol (Always Do First)
+## Session Start Protocol (Always Do First)
 
-At the start of every new or resumed session, before proposing implementation work:
+Before any planning or implementation work:
 
-1. **Load `/skill:project-docs`** and run the "Build Context" steps:
-   - Read all docs in `docs/`
-   - Summarize what you learned in 2–3 sentences
-   - Ask user to confirm or correct understanding
-2. Inspect recent project activity (e.g., changed files, recent commits, open plan docs) to infer what is in progress.
-3. Summarize the inferred current objective, what is done, and what is still open.
-4. Recommend the best next actions (ordered, concrete, and minimal).
-5. If context is still ambiguous, ask one focused clarification question before proceeding.
+1. Load `/skill:project-docs` and run the "Build Context" steps — read all docs in `docs/`, summarize in 2–3 sentences, ask the user to confirm or correct.
+2. Inspect recent project activity (changed files, recent commits, open plan docs) to infer what is in progress.
+3. Summarize the inferred objective, what is done, and what remains.
+4. Recommend the best next actions (ordered, concrete, minimal).
+5. If context is still ambiguous, ask one focused clarification question.
 
-This reestablishment step is mandatory and precedes planning, coding, or verification actions.
+When planning a new feature, load `/skill:brainstorming` before committing to code.
 
-## Session Handoff Checklist
-
-When starting a new planning or implementation session:
-
-1. Load `/skill:project-docs` to get a summary of all docs.
-2. **If planning a new feature:** Load `/skill:brainstorming` to explore requirements, design, and risks before committing to code.
-3. Refer to source docs in `docs/` for detailed information:
-   - `docs/architecture.md` — system design, IPC, storage
-   - `docs/testing.md` — test strategy, mocking, fixtures
-   - `docs/workflow.md` — git patterns, phase gates, handoff procedures
+Detailed reference:
+- `docs/architecture.md` — system design, IPC, storage
+- `docs/testing.md` — test strategy, mocking, fixtures
+- `docs/workflow.md` — git patterns, phase gates, handoff procedures
 
 ## Project-Docs Loading Exclusions
 
@@ -51,82 +39,18 @@ When running the "Build Context" steps, skip these paths:
 
 These paths remain valid **write targets** during `/refine-docs`.
 
-## Workflow Compliance (Mandatory)
+## Workflow Compliance
 
-Before proposing execution mechanics (worktrees, session handoff, clipboard prompts, phase-end gates, merge/cleanup), read and follow `docs/workflow.md`.
+Read `docs/workflow.md` before proposing worktrees, session handoffs, phase-end gates, or merges — it is the operational source of truth.
 
-Required behavior:
+## Context Management
 
-1. Treat `docs/workflow.md` as the operational source of truth for session handoff.
-2. Use the documented parallel-session handoff steps when applicable, preferring the one-line kickoff command flow (directory change + `pi` launch with initial prompt) copied via detached `wl-copy`.
-3. After delegated/parallel implementation reports completion, run the documented phase-end gates process before integration.
-4. Only merge to `main` and clean up worktree/branch after gate results are reviewed and accepted.
-5. After each sub-session review, copy a follow-up feedback prompt to the clipboard via `wl-copy` (automatic, no user confirmation needed). Use the feedback prompt templates in **docs/workflow.md** step 4.
-6. When implementation is approved, copy a follow-up prompt that instructs the sub-session to:
-   - Run `/skill:project-docs` with refine request (update `docs/`)
-   - Commit doc updates with `git commit -m "docs: refine <topic>"`
-   - Report completion and commit SHA
-7. Review the `/refine-docs` commit(s) carefully — docs are the contract for future sessions.
-8. Merge to `main` and clean up worktree/branch only after doc updates are reviewed and accepted.
+When **<60K tokens remain** or the user requests `/refine-docs`, load `/skill:project-docs` and follow the "Refine Docs" steps.
 
-If instructions from memory conflict with `docs/workflow.md`, follow the document and call out the difference explicitly.
-
-## Context Management (Mid-Session Doc Refinement)
-
-When a session is nearing token limit or context exhaustion (guideline: when **<60K tokens remain** in the context budget):
-
-1. **Recognize the signal:** You're running low on tokens, or the user asks for `/refine-docs`.
-2. **Load `/skill:project-docs`** and follow the "Refine Docs" steps:
-   - Review what was learned or changed in this session
-   - Identify which docs should be updated
-   - Draft edits (prefer small, surgical updates)
-   - **Propose before applying** — wait for user approval
-   - Apply changes and report what was updated
-3. **Why this matters:** Compressed, up-to-date docs mean the next session loads fresher context and uses fewer tokens.
-4. **Before writing docs, load `/skill:writing-clearly-and-concisely`** to ensure quality.
-
-### Refinement targets
-
-| Change type | Update |
-|---|---|
-| Architecture | `docs/architecture.md` |
-| Test strategy | `docs/testing.md` |
-| Workflow / process | `docs/workflow.md` |
-| New feature | `docs/user-stories.md` + story file |
-| Session decisions | `docs/session-notes.md` |
-
-### Principles
-
-1. Docs are contracts — stale docs waste tokens re-learning.
-2. Prefer small, surgical updates over rewrites.
-3. Propose before applying — always wait for user approval.
-4. Don't duplicate what the code already makes obvious.
-5. Load `/skill:writing-clearly-and-concisely` before major updates.
-
-## Feature Development Flow
-
-Every feature follows this sequence:
-
-1. **Brainstorm** — Load `/skill:brainstorming` to explore:
-   - What are we solving? Why?
-   - User needs and acceptance criteria
-   - Design options and tradeoffs
-   - Architecture impact and risks
-2. **User story** — Write the feature in `docs/user-stories.md`, capturing brainstorm outcomes.
-3. **Tests first (TDD/BDD)** — Write unit, DOM integration, and/or E2E tests that capture the expected behaviour.
-4. **Implementation** — Write the minimum code to make the tests pass.
-5. **Phase-end gates** — Run `bun run typecheck`, `bun run test`, `bun run test:e2e`. All must pass.
-6. **Doc refinement** — Run `/skill:project-docs` with refine request:
-   - Update `docs/architecture.md`, `docs/testing.md`, or other relevant docs
-   - Commit with `git commit -m "docs: refine <topic> after feature"`
-7. **Merge to main** — Only after all gates pass and docs are updated.
-
-Do not skip steps. Brainstorming before a user story prevents rework and clarifies scope.
-
-## Documentation Placement Preferences
+## Documentation Placement
 
 - Keep `README.md` concise (quick intro, setup, and doc links).
-- Keep core guarantees and phase/status detail in `docs/overview.md` (and deeper docs), not in `README.md`.
-- When updating documentation, preserve this split unless the user asks otherwise.
+- Keep core guarantees and status detail in `docs/` files, not in `README.md`.
+- Preserve this split unless the user asks otherwise.
 
 > **Do not edit this file without explicit user permission.**
